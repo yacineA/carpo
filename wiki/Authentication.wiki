@@ -1,0 +1,18 @@
+#summary One-sentence summary of this page.
+
+= Introduction =
+Authentication contract
+
+
+= Details =
+
+http://70.64.6.83:80/CMPT412Server/JSPSrv.jsp?id=[number]&username=[usermae]&token=[*****]
+
+
+Return:
+
+<xml>
+  <message>
+  YES
+  </message>
+</xml>
