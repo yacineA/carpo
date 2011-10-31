@@ -3,5 +3,8 @@
 
     <string name="hello">Hello World, CarpoActivity!</string>
     <string name="app_name">Carpo</string>
+    <string name="login_label">login with your facebook account</string>
+    <string name="username">username</string>
+    <string name="password">password</string>
 
 </resources>
