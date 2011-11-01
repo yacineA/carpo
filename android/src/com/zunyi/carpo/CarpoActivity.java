@@ -240,7 +240,7 @@ public class CarpoActivity extends Activity {
  
 	}
  
-	private class EventRequestListener implements RequestListener {
+	class EventRequestListener implements RequestListener {
  
 		@Override
 		public void onComplete(String response, Object state) {
@@ -250,6 +250,7 @@ public class CarpoActivity extends Activity {
 				final JSONObject json = new JSONObject(response);
 				JSONArray d = json.getJSONArray("data");
  
+				
 				for (int i = 0; i &lt; d.length(); i++) {
 					JSONObject event = d.getJSONObject(i);
 					FbEvent newEvent = new FbEvent(event.getString("id"),
