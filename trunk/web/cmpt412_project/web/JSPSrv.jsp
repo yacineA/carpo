@@ -5,7 +5,7 @@
 <loginStat>
 	<%
 	String id=request.getParameter("id"); 
-	String username=request.getParameter("username"); 
+	//String username=request.getParameter("username"); 
 	String token=request.getParameter("token");
 	String userInfoStr="";
 	boolean isLogged=false;
@@ -25,8 +25,9 @@
 	JSONObject userInfo=new JSONObject(userInfoStr);
 	//out.print("<h2>"+userInfo.get("updated_time").toString()+"</h2>");
 	//out.print("<h2>"+userInfo.get("name").toString()+"</h2>");
-	if(userInfo.get("updated_time").toString()!=null&&userInfo.get("username").toString().equals(username))
-		isLogged=true;
+	//if(userInfo.get("updated_time").toString()!=null&&userInfo.get("username").toString().equals(username))
+	if(userInfo.get("updated_time").toString()!=null && userInfo.get("id").toString().equals(id))
+            isLogged=true;
 	}
 	catch(Exception e2){
 		//out.print("FALSE");
