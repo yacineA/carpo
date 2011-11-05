@@ -31,6 +31,13 @@
 	catch(Exception e2){
 		//out.print("FALSE");
 	}
-	out.print(isLogged);
+        
+            //out.print(isLogged);
+
 	%>
+        <Message>
+            <%
+                out.print(isLogged);
+            %>
+        </Message>
 </loginStat>
