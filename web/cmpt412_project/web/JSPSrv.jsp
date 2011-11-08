@@ -17,6 +17,8 @@
 		while ((c = reader.read()) != -1)
 			userInfoStr+=(char)c;
 		reader.close();
+                url=null;
+                reader=null;
 	}catch(Exception e){
 		//out.print("Error");
 	}
@@ -28,11 +30,12 @@
 	//if(userInfo.get("updated_time").toString()!=null&&userInfo.get("username").toString().equals(username))
 	if(userInfo.get("updated_time").toString()!=null && userInfo.get("id").toString().equals(id))
             isLogged=true;
+        userInfo=null;
 	}
 	catch(Exception e2){
 		//out.print("FALSE");
 	}
-        
+       
             //out.print(isLogged);
 
 	%>
