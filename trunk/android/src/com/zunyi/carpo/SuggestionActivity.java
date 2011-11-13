@@ -2,6 +2,7 @@ package com.zunyi.carpo;
 
 
 import android.app.ListActivity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -12,6 +13,8 @@ import android.widget.Toast;
 
 
 public class SuggestionActivity extends ListActivity  {
+	
+	private static final String TAG = "SUGGESTION_ACTIVITY";
 	
 	Button skipButton = null;
 	
@@ -42,7 +45,10 @@ public class SuggestionActivity extends ListActivity  {
 		@Override
 		public void onClick(View v) {
 
-			
+			Intent myIntent = new Intent(SuggestionActivity.this,
+					MainMenuActivity.class);
+			SuggestionActivity.this.startActivity(myIntent);
+			finish();
 		}
 		
 	}

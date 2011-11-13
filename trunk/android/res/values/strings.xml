@@ -7,5 +7,9 @@
     <string name="username">username</string>
     <string name="password">password</string>
     <string name="suggestion_screen_title">Carpool Events Suggestions</string>
+    <string name="login_screen_title">Login</string>
+    <string name="mainmenu_screen_title">Mainmenu</string>
+    <string name="carpool_offer_screen_title">Offer</string>
+    <string name="carpool_request_screen_title">Request</string>
 
 </resources>

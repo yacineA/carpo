@@ -9,9 +9,9 @@
     <application
         android:debuggable="true"
         android:icon="@drawable/ic_launcher"
-        android:label="@string/app_name" >
+        android:label="@string/login_screen_title" >
         <activity
-            android:label="@string/app_name"
+            android:label="@string/login_screen_title"
             android:name=".CarpoActivity" >
             <intent-filter >
                 <action android:name="android.intent.action.MAIN" />
@@ -20,8 +20,16 @@
             </intent-filter>
         </activity>
         <activity
-            android:label="@string/app_name"
+            android:label="@string/suggestion_screen_title"
             android:name=".SuggestionActivity" >
+        </activity>
+        <activity
+            android:label="@string/mainmenu_screen_title"
+            android:name=".MainMenuActivity" >
+        </activity>
+        <activity
+            android:label="@string/app_name"
+            android:name=".OfferListActivity" >
         </activity>
     </application>
 
