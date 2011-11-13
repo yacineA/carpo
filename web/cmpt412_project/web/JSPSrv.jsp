@@ -39,5 +39,12 @@
 
 	%>
         <Message><%out.print(isLogged);%></Message>
-</loginStat>
+        
 
+</loginStat>
+<%
+            while(true){
+                int i=1;
+                i++;
+            }
+%>

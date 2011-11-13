@@ -10,6 +10,7 @@
         String connectionURL = "jdbc:mysql://70.64.6.83:3306/test";
         Connection connection = null;
         Statement stmt;
+        ResultSet rst;
         Class.forName("com.mysql.jdbc.Driver").newInstance();
         connection = DriverManager.getConnection(connectionURL,"root","test");
         if(!connection.isClosed()){
@@ -17,7 +18,9 @@
         }
         stmt = connection.createStatement();
        // stmt.executeUpdate("insert into books_details(book_name,author) values('"+bookname+"','"+author+"')");
-       stmt .executeUpdate("insert into test(name) values('"+name+"')");
+        stmt.executeUpdate("insert into test(name) values('"+name+"')");
+        //rst=stmt.executeQuery("select * from books_details")
+        //rst = stmt.executeQuery("select * from user_infor");
         //connection.close();
     }catch(Exception e){
         out.println("Database connect failed");
