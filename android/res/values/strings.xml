@@ -6,5 +6,6 @@
     <string name="login_label">login with your facebook account</string>
     <string name="username">username</string>
     <string name="password">password</string>
+    <string name="suggestion_screen_title">Carpool Events Suggestions</string>
 
 </resources>
