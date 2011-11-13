@@ -32,15 +32,14 @@ import android.widget.Button;
 
 public class CarpoActivity extends Activity {
 
-
 	private static final String APP_ID = "258295044208268";
-	public static final String TAG = "FACEBOOK CONNECT";
+	private static final String TAG = "FACEBOOK CONNECT";
+	private static final String SERVER_URL_AUTH = "http://70.64.6.83:8080/cmpt412_project/JSPSrv.jsp?";
 	Facebook facebook;
 	AsyncFacebookRunner mAsyncRunner;
 	String FILENAME = "AndroidSSO_data";
 
 	Button loginButton = null;
-	Button cancelButton = null;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -57,7 +56,6 @@ public class CarpoActivity extends Activity {
 		mAsyncRunner = new AsyncFacebookRunner(facebook);
 
 		loginButton = (Button) findViewById(R.id.loginButton);
-		cancelButton = (Button) findViewById(R.id.cancelButton);
 
 		loginButton.setOnClickListener(new LoginButtonListener());
 
@@ -70,15 +68,12 @@ public class CarpoActivity extends Activity {
 		facebook.authorizeCallback(requestCode, resultCode, data);
 	}
 
-
-
 	private boolean isAccessTokenValid(String userID, String access_token) {
 		String isValidString = "";
 		try {
 
-			URL url = new URL(
-					"http://10.225.192.66:8080/cmpt412_project/JSPSrv.jsp?id="
-							+ userID + "&token=" + access_token);
+			URL url = new URL(SERVER_URL_AUTH + "id=" + userID + "&token="
+					+ access_token);
 			Log.d(TAG, url.toString());
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 			DocumentBuilder db = dbf.newDocumentBuilder();
@@ -96,7 +91,7 @@ public class CarpoActivity extends Activity {
 		}
 
 		boolean isValid = false;
-		if (isValidString.equals("true")) {
+		if (isValidString.trim().equals("true")) {
 			isValid = true;
 		}
 		return isValid;
@@ -115,11 +110,13 @@ public class CarpoActivity extends Activity {
 					new DialogListener() {
 						@Override
 						public void onComplete(Bundle values) {
-
+							
 							AsyncFacebookRunner asyncRunner = new AsyncFacebookRunner(
 									facebook);
 							asyncRunner.request("me", new IDRequestListener());
-
+							
+							loginButton.setVisibility(View.INVISIBLE);
+							
 						}
 
 						@Override
@@ -134,7 +131,7 @@ public class CarpoActivity extends Activity {
 						public void onCancel() {
 						}
 					});
-
+			
 		}
 
 	}
@@ -149,13 +146,26 @@ public class CarpoActivity extends Activity {
 				JSONObject json = Util.parseJson(response);
 				final String id = json.getString("id");
 
-				if (CarpoActivity.this.isAccessTokenValid(id, facebook.getAccessToken())) {
-					loginButton.setVisibility(View.INVISIBLE);
+				if (CarpoActivity.this.isAccessTokenValid(id,
+						facebook.getAccessToken())) {
+
+					CarpoActivity.this.runOnUiThread(new Runnable() {
+						public void run() {
+
+							Intent myIntent = new Intent(CarpoActivity.this,
+									SuggestionActivity.class);
+							CarpoActivity.this.startActivity(myIntent);
+						}
+					});
 				} else {
-					Util.showAlert(CarpoActivity.this, "Warning",
-							"Token Invalid");
+					CarpoActivity.this.runOnUiThread(new Runnable() {
+						public void run() {
+							Util.showAlert(CarpoActivity.this, "Warning",
+									"Token Invalid");
+						}
+					});
+
 				}
-				
 
 			} catch (JSONException e) {
 				Log.w(TAG, "JSON Error in response");
@@ -197,7 +207,7 @@ public class CarpoActivity extends Activity {
 		}
 
 	}
-
+	
 	class LogoutRequestListener implements RequestListener {
 
 		@Override
