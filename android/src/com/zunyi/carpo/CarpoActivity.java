@@ -34,7 +34,7 @@ public class CarpoActivity extends Activity {
 
 	private static final String APP_ID = "258295044208268";
 	private static final String TAG = "FACEBOOK CONNECT";
-	private static final String SERVER_URL_AUTH = "http://70.64.6.83:8080/cmpt412_project/JSPSrv.jsp?";
+	private static final String SERVER_URL_AUTH = "http://70.64.6.83:8080/cmpt412_project/loginStat?";
 	Facebook facebook;
 	AsyncFacebookRunner mAsyncRunner;
 	String FILENAME = "AndroidSSO_data";
@@ -106,7 +106,7 @@ public class CarpoActivity extends Activity {
 			 * Only call authorize if the access_token has expired.
 			 */
 
-			facebook.authorize(CarpoActivity.this, new String[] {},
+			facebook.authorize(CarpoActivity.this, new String[] {"email"},
 					new DialogListener() {
 						@Override
 						public void onComplete(Bundle values) {
@@ -155,6 +155,7 @@ public class CarpoActivity extends Activity {
 							Intent myIntent = new Intent(CarpoActivity.this,
 									SuggestionActivity.class);
 							CarpoActivity.this.startActivity(myIntent);
+							finish();
 						}
 					});
 				} else {
