@@ -36,7 +36,7 @@ public class loginStat extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
         String id = request.getParameter("id");
-        String username=request.getParameter("username"); 
+        String username = request.getParameter("username");
         String token = request.getParameter("token");
         String userInfoStr = "";
         boolean isLogged = false;
@@ -52,25 +52,30 @@ public class loginStat extends HttpServlet {
             url = null;
             reader = null;
         } catch (Exception e) {
-        //out.print("Error");
+            //out.print("Error");
         }
-    //out.print("<h1>"+name+id+"</h1>\n<h1>"+ token +"</h1>");
+        //out.print("<h1>"+name+id+"</h1>\n<h1>"+ token +"</h1>");
         try {
             JSONObject userInfo = new JSONObject(userInfoStr);
-        //out.print("<h2>"+userInfo.get("updated_time").toString()+"</h2>");
-        //out.print("<h2>"+userInfo.get("name").toString()+"</h2>");
-        //if(userInfo.get("updated_time").toString()!=null&&userInfo.get("username").toString().equals(username))
+            //out.print("<h2>"+userInfo.get("updated_time").toString()+"</h2>");
+            //out.print("<h2>"+userInfo.get("name").toString()+"</h2>");
+            //if(userInfo.get("updated_time").toString()!=null&&userInfo.get("username").toString().equals(username))
             if (userInfo.get("updated_time").toString() != null && userInfo.get("id").toString().equals(id)) {
                 isLogged = true;
+
             }
             userInfo = null;
         } catch (Exception e2) {
-        //out.print("FALSE");
+            //out.print("FALSE");
+        } finally {
+            out.print("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+            out.print("<LoginStat><Message>");
+            out.print(isLogged);
+            out.print("</Message></LoginStat>");
+            out.close();
         }
-        out.print("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-        out.print("<LoginStat><Message>");
-        out.print(isLogged);
-        out.print("</Message></LoginStat>");
+
+
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
