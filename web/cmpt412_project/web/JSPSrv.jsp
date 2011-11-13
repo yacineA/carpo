@@ -2,8 +2,7 @@
 <%@ page import="java.io.*, java.net.URL, java.net.URLConnection, org.json.JSONObject"
 	language="java" contentType="text/xml; charset=UTF-8"
 	pageEncoding="UTF-8"%>
-<loginStat>
-	<%
+<loginStat><%
 	String id=request.getParameter("id"); 
 	//String username=request.getParameter("username"); 
 	String token=request.getParameter("token");
@@ -39,9 +38,6 @@
             //out.print(isLogged);
 
 	%>
-        <Message>
-            <%
-                out.print(isLogged);
-            %>
-        </Message>
+        <Message><%out.print(isLogged);%></Message>
 </loginStat>
+
