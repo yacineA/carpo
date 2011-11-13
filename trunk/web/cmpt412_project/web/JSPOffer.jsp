@@ -17,7 +17,7 @@
         }
         stmt = connection.createStatement();
        // stmt.executeUpdate("insert into books_details(book_name,author) values('"+bookname+"','"+author+"')");
-        stmt.executeUpdate("INSERT INTO test(name) VALUES('"+name+"')");
+       stmt .executeUpdate("insert into test(name) values('"+name+"')");
         //connection.close();
     }catch(Exception e){
         out.println("Database connect failed");
