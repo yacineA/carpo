@@ -5,19 +5,34 @@
     android:gravity="bottom|center_horizontal"
     android:orientation="vertical" >
 
-    <LinearLayout
-        android:id="@+id/linearLayout2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="0.96"
-        android:orientation="vertical" >
 
-        <EditText
-            android:id="@+id/editText2"
+
+        <LinearLayout
+            android:id="@+id/linearLayout3"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="date" 
-            android:hint="Date"/>
+            android:layout_height="wrap_content" >
+
+            <EditText
+                android:id="@+id/dateEditText"
+                android:layout_width="166dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.00"
+                android:imeOptions="actionNext"
+                android:nextFocusDown="@+id/timeEditText"
+                android:hint="Date"
+                android:inputType="date" />
+		
+            <EditText
+                android:id="@+id/timeEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:imeOptions="actionNext"
+                android:nextFocusDown="@+id/fromEditText"
+                android:hint="Time"
+                android:inputType="time" >
+            </EditText>
+
+        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/linearLayout1"
@@ -25,26 +40,26 @@
             android:layout_height="wrap_content" >
 
             <EditText
-                android:id="@+id/editText3"
+                android:id="@+id/fromEditText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:imeOptions="actionNext"
+                android:nextFocusDown="@+id/toEditText"
                 android:layout_weight="1"
-                android:inputType="textPostalAddress" 
-                android:hint="From">
-
-                <requestFocus />
-            </EditText>
+                android:hint="From"
+                android:inputType="textPostalAddress" />
 
             <EditText
-                android:id="@+id/editText1"
+                android:id="@+id/toEditText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:imeOptions="actionGo"
                 android:layout_weight="1"
-                android:inputType="textPostalAddress" 
-                android:hint="To"/>
+                android:hint="To"
+                android:inputType="textPostalAddress" />
 
             <Button
-                android:id="@+id/button1"
+                android:id="@+id/searchEventButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="0.22"
@@ -55,7 +70,8 @@
             android:id="@android:id/list"
             android:layout_width="fill_parent"
             android:layout_height="346dp"
-            android:layout_weight="2.08" />
-    </LinearLayout>
+            android:layout_weight="2.08" >
+        </ListView>
+
 
 </LinearLayout>
