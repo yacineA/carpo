@@ -4,12 +4,17 @@
  */
 package serverlet;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.net.URL;
+import java.net.URLConnection;
+import org.json.JSONObject;
 
 /**
  *
@@ -56,7 +61,6 @@ public class suggestions extends HttpServlet {
             //if(userInfo.get("updated_time").toString()!=null&&userInfo.get("username").toString().equals(username))
             if (userInfo.get("updated_time").toString() != null && userInfo.get("id").toString().equals(id)) {
                 isLogged = true;
-
             }
             userInfo = null;
         } catch (Exception e2) {
