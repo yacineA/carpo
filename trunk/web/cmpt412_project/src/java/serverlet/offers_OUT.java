@@ -5,67 +5,34 @@
 package serverlet;
 
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.net.URL;
-import java.net.URLConnection;
 import java.sql.*;
-import java.util.Random;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.json.JSONObject;
+import superclass.Events;
 
 /**
  *
  * @author wen
  */
-@WebServlet(name = "offers", urlPatterns = {"/offers"})
-public class offers extends HttpServlet {
+@WebServlet(name = "offers_OUT", urlPatterns = {"/offers_out"})
+public class offers_OUT extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         String id = request.getParameter("id");
         String token = request.getParameter("token");
-        String userInfoStr = "";
         boolean isLogged = false;
         PrintWriter out = response.getWriter();
         try {
-
-
-            try {
-                URL url = new URL("https://graph.facebook.com/" + id + "?fields=updated_time&access_token=" + token);
-                URLConnection uc = url.openConnection();
-                InputStreamReader reader = new InputStreamReader(new BufferedInputStream(url.openStream()));
-                int c;
-                while ((c = reader.read()) != -1) {
-                    userInfoStr += (char) c;
-                }
-                reader.close();
-                url = null;
-                reader = null;
-
-
-            } catch (Exception e) {
-                out.print(e.toString());
-            }
-
-            try {
-                JSONObject userInfo = new JSONObject(userInfoStr);
-                if (userInfo.get("updated_time").toString() != null) {
-                    isLogged = true;
-                }
-                userInfo = null;
-            } catch (Exception e) {
-                out.print(e.toString());
-            }
-      
-             
+            Events e = new Events();
+            isLogged = e.verify_token(id, token);
+            out.print(isLogged);
              
         } finally {
             
@@ -87,6 +54,8 @@ public class offers extends HttpServlet {
                         String u_status = rs.getString("status");
                         String u_capcity = rs.getString("capacity");
                         String u_share = rs.getString("if_share");
+                        String e_elat = rs.getString("end_lat");
+                        String e_elog = rs.getString("end_log");
                         
                         out.println("<Offer>");                   
                         out.println("<id>"+u_id+"</id>");
@@ -97,6 +66,8 @@ public class offers extends HttpServlet {
                         out.println("<status>"+u_status+"</status>");
                         out.println("<capacity>"+u_capcity+"</capacity>");
                         out.println("<if_share>"+u_share+"if_share");
+                        out.println("<end_lat>"+e_elat+"</end_lat>");
+                        out.println("<end_log>"+e_elog+"</end_log>");
                         out.println("</Offer>");
                                                 
                     }
