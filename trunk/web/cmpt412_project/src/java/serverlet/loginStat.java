@@ -4,6 +4,11 @@
  */
 package serverlet;
 
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.sql.Connection;
+import java.sql.DriverManager;
+
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -41,7 +46,7 @@ public class loginStat extends HttpServlet {
         String userInfoStr = "";
         boolean isLogged = false;
         try {
-            URL url = new URL("https://graph.facebook.com/" + id + "?fields=username,updated_time&access_token=" + token);
+            URL url = new URL("https://graph.facebook.com/" + id + "?fields=username,email,updated_time&access_token=" + token);
             URLConnection uc = url.openConnection();
             InputStreamReader reader = new InputStreamReader(new BufferedInputStream(url.openStream()));
             int c;
@@ -62,7 +67,19 @@ public class loginStat extends HttpServlet {
             //if(userInfo.get("updated_time").toString()!=null&&userInfo.get("username").toString().equals(username))
             if (userInfo.get("updated_time").toString() != null && userInfo.get("id").toString().equals(id)) {
                 isLogged = true;
-
+                try{
+                    Class.forName("com.mysql.jdbc.Driver");
+                    Connection con=DriverManager.getConnection("jdbc:mysql://70.64.6.83:3306/test","root","test");
+                    Statement stmt=con.createStatement();
+                    ResultSet rs=stmt.executeQuery("select * from user_info where id="+id);
+                    if(!rs.next()){
+                        username=userInfo.getString("username").toString();
+                        String email=userInfo.getString("email");
+                        stmt.executeUpdate("INSERT INTO test.user_info (id, name, email, status, type_code, driver_rating, passenger_rating)VALUES ("+id+", '"+username+"', '"+email+"', 1, 0, DEFAULT, DEFAULT)");
+                    }
+                }catch(Exception sqle){
+                    out.print(sqle.toString());
+                }
             }
             userInfo = null;
         } catch (Exception e2) {
