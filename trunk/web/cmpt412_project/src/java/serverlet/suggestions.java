@@ -84,8 +84,22 @@ public class suggestions extends HttpServlet {
                     while(rs.next()){
                         out.print("<Suggestion>");
                             out.print("<Type>Offer</Type>");
-                            int idT=rs.getInt("id");
-                            out.print("<ID>"+idT+"</ID>");
+                            String tmpStr=rs.getString("id");
+                            out.print("<ID>"+tmpStr+"</ID>");
+                            tmpStr=rs.getString("creator");
+                            out.print("<Creator>"+tmpStr+"</Creator>");
+                            tmpStr=rs.getString("start_time");
+                            out.print("<StartTime>"+tmpStr+"</StartTime>");
+                            tmpStr=rs.getString("start_lat");
+                            out.print("<StartLatitude>"+tmpStr+"</StartLatitude>");
+                            tmpStr=rs.getString("start_log");
+                            out.print("<StartLongitude>"+tmpStr+"</StartLongitude>");
+                            tmpStr=rs.getString("status");
+                            out.print("<Status>"+tmpStr+"</Status>");
+                            tmpStr=rs.getString("capacity");
+                            out.print("<Capacity>"+tmpStr+"</Capacity>");
+                            tmpStr=rs.getString("if_share");
+                            out.print("<Shared>"+tmpStr+"</Shared>");
                         out.print("</Suggestion>");
                     }
                 }catch(Exception sqle){
