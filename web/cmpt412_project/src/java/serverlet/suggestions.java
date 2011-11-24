@@ -40,7 +40,12 @@ public class suggestions extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
-  
+        float currentLat=91.0f;
+        float currentLong=181.0f;
+        if(request.getParameter("lat")!=null)
+            currentLat=Float.parseFloat(request.getParameter("lat"));
+        if(request.getParameter("long")!=null)
+            currentLong=Float.parseFloat(request.getParameter("long"));
         String id = request.getParameter("id");
         String username = request.getParameter("username");
         String token = request.getParameter("token");
@@ -80,7 +85,16 @@ public class suggestions extends HttpServlet {
                     Class.forName("com.mysql.jdbc.Driver");
                     Connection con=DriverManager.getConnection("jdbc:mysql://70.64.6.83:3306/test","root","test");
                     Statement stmt=con.createStatement();
-                    ResultSet rs=stmt.executeQuery("select * from offer");
+                    ResultSet rs=null;
+                    if(currentLat>=-90.0f&&currentLat<=90.0f&&currentLong>=-180.0f&&currentLong<=180.0f){
+                        double currentLatDown=currentLat-0.01;
+                        double currentLatUp=currentLat+0.01;
+                        double currentLongLeft=currentLong-0.01;
+                        double currentLongRight=currentLong+0.01;
+                        rs=stmt.executeQuery("select * from offer where start_lat>"+currentLatDown+" AND start_lat<"+currentLatUp+" AND start_log>"+currentLongLeft+" AND start_log<"+currentLongRight);
+                    }else{
+                    rs=stmt.executeQuery("select * from offer");
+                    }
                     while(rs.next()){
                         out.print("<Suggestion>");
                             out.print("<Type>Offer</Type>");
