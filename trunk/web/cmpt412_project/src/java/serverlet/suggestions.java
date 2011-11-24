@@ -4,6 +4,13 @@
  */
 package serverlet;
 
+import java.sql.Blob;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.DriverManager;
+
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -65,7 +72,29 @@ public class suggestions extends HttpServlet {
             userInfo = null;
         } catch (Exception e2) {
             //out.print("FALSE");
-        } finally {            
+        } finally {
+            out.print("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+            if(isLogged){
+                out.print("<Suggestions>");
+                try{
+                    Class.forName("com.mysql.jdbc.Driver");
+                    Connection con=DriverManager.getConnection("jdbc:mysql://70.64.6.83:3306/test","root","test");
+                    Statement stmt=con.createStatement();
+                    ResultSet rs=stmt.executeQuery("select * from offer");
+                    while(rs.next()){
+                        out.print("<Suggestion>");
+                            out.print("<Type>Offer</Type>");
+                            int idT=rs.getInt("id");
+                            out.print("<ID>"+idT+"</ID>");
+                        out.print("</Suggestion>");
+                    }
+                }catch(Exception sqle){
+                    out.print(sqle.getMessage());
+                }
+                out.print("</Suggestions>");
+            }else{
+                 out.print("<Error><ID>1</ID></Error>");
+            }
             out.close();
         }
     }
