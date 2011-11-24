@@ -35,8 +35,7 @@ public class offers extends HttpServlet {
         String userInfoStr = "";
         boolean isLogged = false;
         PrintWriter out = response.getWriter();
-        try {
-
+        try {out.print("Helllo");
 
 
             try {
@@ -65,12 +64,13 @@ public class offers extends HttpServlet {
             } catch (Exception e) {
                 out.print(e.toString());
             }
+      
              
              
         } finally {
-            
+            out.print("heyß=");
             out.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-           /* if(isLogged){
+            if(isLogged){
                 out.println("<Offers>");
                 try{
                     Class.forName("com.mysql.jdbc.Driver");
@@ -112,16 +112,16 @@ public class offers extends HttpServlet {
                 out.println("<id>"+id+"</id>");
                 out.println("</Error>");
             }
-             * 
-             */
-            try {
+             
+       /*     try {
                 Class.forName("com.mysql.jdbc.Driver");
                     Connection con=DriverManager.getConnection("jdbc:mysql://70.64.6.83:3306/test","root","test");
                     Statement stmt = con.createStatement();
-                    ResultSet rs = stmt.executeQuery("select * from offer");
-            for(int i=0; i<1000; i++){
-                        int temp_id =703521397;
-                        String temp_creator = "user__"+i;
+                    //ResultSet rs = stmt.executeQuery("select * from offer");
+                    
+            for(int i=0; i<2000; i++){
+                        int temp_id;
+                        String temp_creator = "1234213411";
                         Random randomGenerator = new Random ();
                         int mon = randomGenerator.nextInt(11)+1;
                         int day = randomGenerator.nextInt(30)+1;
@@ -134,12 +134,16 @@ public class offers extends HttpServlet {
                         int temp_status = randomGenerator.nextInt(1);
                         int temp_capacity = randomGenerator.nextInt(10);
                         int temp_share = randomGenerator.nextInt(1);
-                        stmt.executeUpdate("INSERT INTO test.offers (id, creator, start_time, start_lat, start_log, status, capacity,if_share)VALUES "
-                                + "("+temp_id+", '"+temp_creator+"', '"+temp_stime+"', '"+temp_lat+"','"+temp_log+"','"+temp_status+"','"+temp_capacity+"','"+temp_share+"')"); 
-                    }
+                        stmt.executeUpdate("INSERT INTO test.offer ( creator, start_time, start_lat, start_log, status, capacity,if_share)VALUES "
+                                + "('"+temp_creator+"', '"+temp_stime+"', '"+temp_lat+"','"+temp_log+"','"+temp_status+"','"+temp_capacity+"','"+temp_share+"')"); 
+                        out.print("date"+temp_stime);
+                }
             } catch (Exception e) {
+                out.print(e.toString());
             }
-            
+         
+             * 
+             */
             out.close();
         }
     }
