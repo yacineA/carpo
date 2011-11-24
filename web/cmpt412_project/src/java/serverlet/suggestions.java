@@ -4,11 +4,9 @@
  */
 package serverlet;
 
-import java.sql.Blob;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.sql.DriverManager;
 
 import java.io.BufferedInputStream;
@@ -16,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -27,6 +26,7 @@ import org.json.JSONObject;
  *
  * @author Executor
  */
+@WebServlet(name = "suggestions", urlPatterns = {"/suggestions"})
 public class suggestions extends HttpServlet {
 
     /** 
