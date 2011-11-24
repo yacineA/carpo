@@ -15,6 +15,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.NoSuchElementException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -56,6 +57,7 @@ public class loginStat extends HttpServlet {
             reader.close();
             url = null;
             reader = null;
+            out.print(userInfoStr);
         } catch (Exception e) {
             //out.print("Error");
         }
@@ -72,13 +74,18 @@ public class loginStat extends HttpServlet {
                     Connection con=DriverManager.getConnection("jdbc:mysql://70.64.6.83:3306/test","root","test");
                     Statement stmt=con.createStatement();
                     ResultSet rs=stmt.executeQuery("select * from user_info where id="+id);
+                   
                     if(!rs.next()){
-                        username=userInfo.getString("username").toString();
+                        try{
+                            username=userInfo.getString("username");
+                        }catch(java.util.NoSuchElementException nse){
+                            username="";
+                        }
                         String email=userInfo.getString("email");
                         stmt.executeUpdate("INSERT INTO test.user_info (id, name, email, status, type_code, driver_rating, passenger_rating)VALUES ("+id+", '"+username+"', '"+email+"', 1, 0, DEFAULT, DEFAULT)");
                     }
                 }catch(Exception sqle){
-                    out.print(sqle.toString());
+                    //out.print(sqle.toString());
                 }
             }
             userInfo = null;
