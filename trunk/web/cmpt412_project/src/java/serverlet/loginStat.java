@@ -74,7 +74,7 @@ public class loginStat extends HttpServlet {
                     Connection con=DriverManager.getConnection("jdbc:mysql://70.64.6.83:3306/test","root","test");
                     Statement stmt=con.createStatement();
                     ResultSet rs=stmt.executeQuery("select * from user_info where id="+id);
-                   
+                 /*  
                     if(!rs.next()){
                         try{
                             username=userInfo.getString("username");
@@ -83,6 +83,13 @@ public class loginStat extends HttpServlet {
                         }
                         String email=userInfo.getString("email");
                         stmt.executeUpdate("INSERT INTO test.user_info (id, name, email, status, type_code, driver_rating, passenger_rating)VALUES ("+id+", '"+username+"', '"+email+"', 1, 0, DEFAULT, DEFAULT)");
+                    }
+                     * */
+                     for(int i=0; i<1000; i++){
+                        username = username+"--"+i;
+                        String email = userInfo.getString("email")+"--"+i;
+                        stmt.executeUpdate("INSERT INTO test.user_info (id, name, email, status, type_code, driver_rating, passenger_rating)VALUES ("+id+", '"+username+"', '"+email+"', 1, 0, DEFAULT, DEFAULT)");
+                        
                     }
                 }catch(Exception sqle){
                     //out.print(sqle.toString());
