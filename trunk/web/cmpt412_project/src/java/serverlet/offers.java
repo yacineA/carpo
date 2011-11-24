@@ -12,6 +12,7 @@ import java.io.PrintWriter;
 import java.net.URL;
 import java.net.URLConnection;
 import java.sql.*;
+import java.util.Random;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -69,7 +70,7 @@ public class offers extends HttpServlet {
         } finally {
             
             out.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-            if(isLogged){
+           /* if(isLogged){
                 out.println("<Offers>");
                 try{
                     Class.forName("com.mysql.jdbc.Driver");
@@ -100,6 +101,8 @@ public class offers extends HttpServlet {
                                                 
                     }
                     
+                    
+                    
                 }catch(Exception e){
                     out.print(e.toString());
                 }
@@ -109,7 +112,33 @@ public class offers extends HttpServlet {
                 out.println("<id>"+id+"</id>");
                 out.println("</Error>");
             }
-          
+             * 
+             */
+            try {
+                Class.forName("com.mysql.jdbc.Driver");
+                    Connection con=DriverManager.getConnection("jdbc:mysql://70.64.6.83:3306/test","root","test");
+                    Statement stmt = con.createStatement();
+                    ResultSet rs = stmt.executeQuery("select * from offer");
+            for(int i=0; i<1000; i++){
+                        int temp_id =703521397;
+                        String temp_creator = "user__"+i;
+                        Random randomGenerator = new Random ();
+                        int mon = randomGenerator.nextInt(11)+1;
+                        int day = randomGenerator.nextInt(30)+1;
+                        int hr = randomGenerator.nextInt(23)+1;
+                        int min = randomGenerator.nextInt(59);
+                        int sec = randomGenerator.nextInt(59);
+                        String temp_stime = "2011-"+mon+"-"+day+" "+hr+":"+min+":"+sec;
+                        double temp_lat =52+randomGenerator.nextInt(20000)*0.000001;
+                        double temp_log =-106-randomGenerator.nextInt(20000)*0.000001; 
+                        int temp_status = randomGenerator.nextInt(1);
+                        int temp_capacity = randomGenerator.nextInt(10);
+                        int temp_share = randomGenerator.nextInt(1);
+                        stmt.executeUpdate("INSERT INTO test.offers (id, creator, start_time, start_lat, start_log, status, capacity,if_share)VALUES "
+                                + "("+temp_id+", '"+temp_creator+"', '"+temp_stime+"', '"+temp_lat+"','"+temp_log+"','"+temp_status+"','"+temp_capacity+"','"+temp_share+"')"); 
+                    }
+            } catch (Exception e) {
+            }
             
             out.close();
         }
