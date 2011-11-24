@@ -22,11 +22,13 @@ import com.facebook.android.AsyncFacebookRunner.RequestListener;
 import com.facebook.android.Facebook.*;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 
@@ -35,10 +37,12 @@ public class CarpoActivity extends Activity {
 	private static final String APP_ID = "258295044208268";
 	private static final String TAG = "FACEBOOK CONNECT";
 	private static final String SERVER_URL_AUTH = "http://70.64.6.83:8080/cmpt412_project/loginStat?";
+    private ProgressDialog mSpinner;
 	Facebook facebook;
 	AsyncFacebookRunner mAsyncRunner;
 	String FILENAME = "AndroidSSO_data";
-
+	public static String FACEBOOK_USER_ID;
+	public static String FACEBOOK_TOKEN;
 	Button loginButton = null;
 
 	/** Called when the activity is first created. */
@@ -58,6 +62,10 @@ public class CarpoActivity extends Activity {
 		loginButton = (Button) findViewById(R.id.loginButton);
 
 		loginButton.setOnClickListener(new LoginButtonListener());
+		
+        mSpinner = new ProgressDialog(this);
+        mSpinner.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        mSpinner.setMessage("Verifying Token...");
 
 	}
 
@@ -71,7 +79,7 @@ public class CarpoActivity extends Activity {
 	private boolean isAccessTokenValid(String userID, String access_token) {
 		String isValidString = "";
 		try {
-
+			
 			URL url = new URL(SERVER_URL_AUTH + "id=" + userID + "&token="
 					+ access_token);
 			Log.d(TAG, url.toString());
@@ -93,6 +101,8 @@ public class CarpoActivity extends Activity {
 		boolean isValid = false;
 		if (isValidString.trim().equals("true")) {
 			isValid = true;
+			FACEBOOK_TOKEN = access_token;
+			FACEBOOK_USER_ID = userID;
 		}
 		return isValid;
 	}
@@ -141,6 +151,15 @@ public class CarpoActivity extends Activity {
 		@Override
 		public void onComplete(String response, Object state) {
 			try {
+				
+				CarpoActivity.this.runOnUiThread(new Runnable() {
+					public void run() {
+
+						mSpinner.show();
+					}
+				});
+				
+				
 				// process the response here: executed in background thread
 				Log.d(TAG, "Response: " + response.toString());
 				JSONObject json = Util.parseJson(response);
@@ -148,10 +167,11 @@ public class CarpoActivity extends Activity {
 
 				if (CarpoActivity.this.isAccessTokenValid(id,
 						facebook.getAccessToken())) {
-
+					
 					CarpoActivity.this.runOnUiThread(new Runnable() {
 						public void run() {
-
+							
+							mSpinner.dismiss();
 							Intent myIntent = new Intent(CarpoActivity.this,
 									SuggestionActivity.class);
 							CarpoActivity.this.startActivity(myIntent);

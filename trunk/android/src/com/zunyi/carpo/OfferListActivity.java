@@ -2,10 +2,12 @@ package com.zunyi.carpo;
 
 import java.util.Calendar;
 
+
 import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.app.ListActivity;
 import android.os.Bundle;
-import android.util.Log;
+
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -31,15 +33,12 @@ public class OfferListActivity extends ListActivity {
 		fromEditText = (EditText) findViewById(R.id.fromEditText);
 		toEditText = (EditText) findViewById(R.id.toEditText);
 
-		DatePickerDialog datePickerDialog = new DatePickerDialog(this,
-				mDateSetListener, mYear, mMonth, mDay);
-
-		dateEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+		dateEditText.setOnClickListener(new View.OnClickListener() {
+			
 			@Override
-			public void onFocusChange(View v, boolean hasFocus) {
-				int i;
-				i = 0;
-
+			public void onClick(View v) {
+				showDialog(ID_DATEPICKER);
+				
 			}
 		});
 
@@ -71,5 +70,15 @@ public class OfferListActivity extends ListActivity {
 				// Month is 0 based so add 1
 				.append(mMonth + 1).append("-").append(mDay).append("-")
 				.append(mYear).append(" "));
+	}
+	
+	protected Dialog onCreateDialog(int id) {
+	    switch (id) {
+	    case ID_DATEPICKER:
+	        return new DatePickerDialog(this,
+	                    mDateSetListener,
+	                    mYear, mMonth, mDay);
+	    }
+	    return null;
 	}
 }
