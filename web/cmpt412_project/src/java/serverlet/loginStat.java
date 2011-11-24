@@ -57,7 +57,7 @@ public class loginStat extends HttpServlet {
             reader.close();
             url = null;
             reader = null;
-            out.print(userInfoStr);
+            //out.print(userInfoStr);
         } catch (Exception e) {
             //out.print("Error");
         }
