@@ -35,7 +35,7 @@ public class offers extends HttpServlet {
         String userInfoStr = "";
         boolean isLogged = false;
         PrintWriter out = response.getWriter();
-        try {out.print("Helllo");
+        try {
 
 
             try {
@@ -68,7 +68,7 @@ public class offers extends HttpServlet {
              
              
         } finally {
-            out.print("heyß=");
+            
             out.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
             if(isLogged){
                 out.println("<Offers>");
