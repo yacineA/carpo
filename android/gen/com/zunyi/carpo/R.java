@@ -16,30 +16,30 @@ public final class R {
         public static final int ic_launcher=0x7f020002;
     }
     public static final class id {
-        public static final int ScrollView01=0x7f050004;
-        public static final int bottomtext=0x7f05000f;
-        public static final int carpool_offer_button=0x7f050002;
-        public static final int carpool_request_button=0x7f050003;
-        public static final int dateEditText=0x7f050006;
-        public static final int event_type_icon=0x7f05000c;
-        public static final int fromEditText=0x7f050008;
-        public static final int linearLayout1=0x7f050009;
-        public static final int linearLayout3=0x7f050005;
-        public static final int loginButton=0x7f050001;
-        public static final int middletext=0x7f05000e;
-        public static final int searchEventButton=0x7f05000b;
+        public static final int ScrollView01=0x7f050000;
+        public static final int bottomtext=0x7f05000b;
+        public static final int carpool_offer_button=0x7f05000e;
+        public static final int carpool_request_button=0x7f05000f;
+        public static final int dateEditText=0x7f050002;
+        public static final int event_type_icon=0x7f050008;
+        public static final int fromEditText=0x7f050004;
+        public static final int linearLayout1=0x7f050005;
+        public static final int linearLayout3=0x7f050001;
+        public static final int loginButton=0x7f05000d;
+        public static final int middletext=0x7f05000a;
+        public static final int searchEventButton=0x7f050007;
         public static final int skipButton=0x7f050010;
-        public static final int textView1=0x7f050000;
-        public static final int timeEditText=0x7f050007;
-        public static final int toEditText=0x7f05000a;
-        public static final int toptext=0x7f05000d;
+        public static final int textView1=0x7f05000c;
+        public static final int timeEditText=0x7f050003;
+        public static final int toEditText=0x7f050006;
+        public static final int toptext=0x7f050009;
     }
     public static final class layout {
         public static final int eventdetailedview=0x7f030000;
-        public static final int main=0x7f030001;
-        public static final int mainmenu=0x7f030002;
-        public static final int offerlist=0x7f030003;
-        public static final int offerlistrow=0x7f030004;
+        public static final int eventlist=0x7f030001;
+        public static final int eventlistrow=0x7f030002;
+        public static final int main=0x7f030003;
+        public static final int mainmenu=0x7f030004;
         public static final int suggestion=0x7f030005;
     }
     public static final class string {
