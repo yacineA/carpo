@@ -57,12 +57,12 @@ public class rating_IN extends HttpServlet {
                     }
                     
                     temp = temp/counter;
-                    out.print("rator avg = "+temp);
+                    
                     temp1 = Float.valueOf(rating_mark.trim()).floatValue();
                     
                     temp = Math.sqrt(temp1 * temp);
                     rating_mark = Double.toString(temp);
-                    out.print("rating mark = "+rating_mark);
+                    
                     stmt.executeUpdate("INSERT INTO test.rating (user_id, rating, comment) VALUES"
                             +"('"+ratee_id+"','"+rating_mark+"','"+comment+"')");
                 } catch (Exception ex) {
