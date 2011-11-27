@@ -40,12 +40,15 @@ public class suggestions extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
-        float currentLat=91.0f;
-        float currentLong=181.0f;
+        float currentLat=91.0f;//an invalid initial value
+        float currentLong=181.0f;//an invalid initial value
+        int count=0;
         if(request.getParameter("lat")!=null)
             currentLat=Float.parseFloat(request.getParameter("lat"));
         if(request.getParameter("long")!=null)
             currentLong=Float.parseFloat(request.getParameter("long"));
+        if(request.getParameter("count")!=null)
+            count=Integer.parseInt(request.getParameter("count"));
         String id = request.getParameter("id");
         String username = request.getParameter("username");
         String token = request.getParameter("token");
@@ -91,9 +94,16 @@ public class suggestions extends HttpServlet {
                         double currentLatUp=currentLat+0.01;
                         double currentLongLeft=currentLong-0.01;
                         double currentLongRight=currentLong+0.01;
-                        rs=stmt.executeQuery("select * from offer where start_lat>"+currentLatDown+" AND start_lat<"+currentLatUp+" AND start_log>"+currentLongLeft+" AND start_log<"+currentLongRight);
+                        if (count==0)   
+                            rs=stmt.executeQuery("select * from offer where start_lat>"+currentLatDown+" AND start_lat<"+currentLatUp+" AND start_log>"+currentLongLeft+" AND start_log<"+currentLongRight);
+                        else
+                            rs=stmt.executeQuery("select * from offer where start_lat>"+currentLatDown+" AND start_lat<"+currentLatUp+" AND start_log>"+currentLongLeft+" AND start_log<"+currentLongRight+" LIMIT "+count);
+                        
                     }else{
-                    rs=stmt.executeQuery("select * from offer");
+                        if(count==0)
+                            rs=stmt.executeQuery("select * from offer");
+                        else
+                            rs=stmt.executeQuery("select * from offer LIMIT "+count);
                     }
                     while(rs.next()){
                         out.print("<Suggestion>");
