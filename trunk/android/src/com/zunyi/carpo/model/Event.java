@@ -1,6 +1,6 @@
 package com.zunyi.carpo.model;
 
-import java.sql.Date;
+import java.util.Date;
 
 
 
@@ -16,52 +16,52 @@ public abstract class Event {
 	private float endLog;
 	private boolean status;
 
-	int getId() {
+	public int getId() {
 		return id;
 	}
-	void setId(int id) {
+	public void setId(int id) {
 		this.id = id;
 	}
-	int getCreator() {
+	public int getCreator() {
 		return creator;
 	}
-	void setCreator(int creator) {
+	public void setCreator(int creator) {
 		this.creator = creator;
 	}
-	Date getStartTimeDate() {
+	public Date getStartTimeDate() {
 		return startTimeDate;
 	}
-	void setStartTimeDate(Date startTimeDate) {
+	public void setStartTimeDate(Date startTimeDate) {
 		this.startTimeDate = startTimeDate;
 	}
-	float getStartLat() {
+	public float getStartLat() {
 		return startLat;
 	}
-	void setStartLat(float startLat) {
+	public void setStartLat(float startLat) {
 		this.startLat = startLat;
 	}
-	float getStartLog() {
+	public float getStartLog() {
 		return startLog;
 	}
-	void setStartLog(float startLog) {
+	public void setStartLog(float startLog) {
 		this.startLog = startLog;
 	}
-	float getEndLat() {
+	public float getEndLat() {
 		return endLat;
 	}
-	void setEndLat(float endLat) {
+	public void setEndLat(float endLat) {
 		this.endLat = endLat;
 	}
-	float getEndLog() {
+	public float getEndLog() {
 		return endLog;
 	}
-	void setEndLog(float endLog) {
+	public void setEndLog(float endLog) {
 		this.endLog = endLog;
 	}
-	boolean isStatus() {
+	public boolean isStatus() {
 		return status;
 	}
-	void setStatus(boolean status) {
+	public void setStatus(boolean status) {
 		this.status = status;
 	}
 

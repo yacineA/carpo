@@ -11,5 +11,6 @@
     <string name="mainmenu_screen_title">Mainmenu</string>
     <string name="carpool_offer_screen_title">Offer</string>
     <string name="carpool_request_screen_title">Request</string>
+    <string name="SERVER_URL">http://70.64.6.83:8080/cmpt412_project/</string>
 
 </resources>
