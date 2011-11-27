@@ -34,7 +34,8 @@ public class offers_OUT extends HttpServlet {
             isLogged = e.verify_token(id, token);
             out.print(isLogged);
              
-        } finally {
+        } catch(Exception e){
+        }finally {
             
             out.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
             if(isLogged){
@@ -79,9 +80,11 @@ public class offers_OUT extends HttpServlet {
                 }
                 out.println("</Offers>");
             }else{
+                
                 out.println("<Error>");
                 out.println("<id>"+id+"</id>");
                 out.println("</Error>");
+                
             }
              
        /*     try {

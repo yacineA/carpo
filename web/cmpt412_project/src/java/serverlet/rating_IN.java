@@ -4,11 +4,10 @@
  */
 package serverlet;
 
+import java.sql.*;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.Statement;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -20,51 +19,63 @@ import superclass.Events;
  *
  * @author wen
  */
-@WebServlet(name = "offers_IN", urlPatterns = {"/offers_in"})
-public class offers_IN extends HttpServlet {
+@WebServlet(name = "rating_IN", urlPatterns = {"/rating_in"})
+public class rating_IN extends HttpServlet {
 
+   
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
+        boolean isLogged = false;
         String id = request.getParameter("id");
         String token = request.getParameter("token");
-        String creator = request.getParameter("creator");
-        String stime = request.getParameter("start_time");
-        String slat = request.getParameter("start_lat");
-        String slog = request.getParameter("start_log");
-        String status = request.getParameter("status");
-        String capacity = request.getParameter("capacity");
-        String share = request.getParameter("if_share");
-        String elat = request.getParameter("end_lat");
-        String elog = request.getParameter("end_log");
-
-        boolean isLogged = false;
+        String rating_mark = request.getParameter("rate");
+        String ratee_id = request.getParameter("ratee_id");
+        String comment = request.getParameter("comment");
+        int counter = 0;
+        double temp = 0;
+        double temp1;
         try {
-
             Events events = new Events();
-            isLogged = events.verify_token(id, token);
-
-        } catch (Exception e){
-        }finally {
-            if (isLogged) {
+            isLogged=events.verify_token(id, token);
+            
+        } catch(Exception e){
+            e.printStackTrace();
+        }finally {     
+            out.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+            if(isLogged){
                 try {
                     Class.forName("com.mysql.jdbc.Driver");
-                    Connection con = DriverManager.getConnection("jdbc:mysql://70.64.6.83:3306/test", "root", "test");
+                    Connection con = DriverManager.getConnection("jdbc:mysql://70.64.6.83:3306/test", "root", "test");                    
                     Statement stmt = con.createStatement();
+                    ResultSet rs = stmt.executeQuery("SELECT rating FROM rating WHERE user_id ='"+id+"'");                    
+                    while(rs.next()){
+                        String r = rs.getString("rating");
+                        temp = temp + Float.valueOf(r.trim()).floatValue();
+                        counter++;
+                    }
                     
-                    stmt.executeUpdate("INSERT INTO test.offer ( id, creator, start_time, start_lat, start_log, status, capacity, if_share, end_lat, end_log)VALUES "
-                                + "('"+id+"', '"+creator+"', '"+stime+"','"+slat+"','"+slog+"','"+status+"','"+capacity+"', '"+share+"', '"+elat+"', '"+elog+"')"); 
-                    out.println("<Message>");
-                    out.println("true");
-                    out.println("</Message");
-                } catch (Exception e) {
+                    temp = temp/counter;
+                    out.print("rator avg = "+temp);
+                    temp1 = Float.valueOf(rating_mark.trim()).floatValue();
+                    
+                    temp = Math.sqrt(temp1 * temp);
+                    rating_mark = Double.toString(temp);
+                    out.print("rating mark = "+rating_mark);
+                    stmt.executeUpdate("INSERT INTO test.rating (user_id, rating, comment) VALUES"
+                            +"('"+ratee_id+"','"+rating_mark+"','"+comment+"')");
+                } catch (Exception ex) {
+                    ex.printStackTrace();
                 }
-
-            } else {
+                
                 out.println("<Message>");
-                out.println("false");
-                out.println("</Message");
+                out.println(true);
+                out.println("</Message>");
+            }else{
+                 out.println("<Error>");
+                out.println("<id>"+id+"</id>");
+                out.println("</Error>");
             }
             out.close();
         }
@@ -106,3 +117,6 @@ public class offers_IN extends HttpServlet {
         return "Short description";
     }// </editor-fold>
 }
+
+
+//http://localhost:8080/cmpt412_project/rating_in?id=703521397&token=AAACEdEose0cBAHoK1YgNBlLLf1cdlKYtI7FbC1QvZCqg8aJiMP6Au8LYLfMyc7ZBkZBJXZCiWvLOPf57w4QmgXDHQJ0xVMmHZAtnZAIwjEqAZDZD&rate=3&ratee_id=722
