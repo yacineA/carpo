@@ -20,8 +20,10 @@ import com.zunyi.carpo.model.Request;
 
 import android.app.ListActivity;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -36,6 +38,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.openenviron.andeasylib.EasyLocation;
+
+
 public class SuggestionActivity extends ListActivity {
 
 	private static final String TAG = "SUGGESTION_ACTIVITY";
@@ -46,11 +51,43 @@ public class SuggestionActivity extends ListActivity {
 	private EventListAdaptor eventListAdaptor = null;
 	private Runnable viewSuggestions;
 	Button skipButton = null;
-
+	String curLatitudeString = null;
+	String curLongitudeString = null;
+	
 	@Override
 	public void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
 		setContentView(R.layout.suggestion);
+
+		// Start The GPS Service by passing it the main activity.
+		EasyLocation.startGPS(this);
+
+		// Create a Broadcast Reciver for using the library, it is needed for
+		// every module, as all the available data is brodcasted as intents.
+		BroadcastReceiver br = new BroadcastReceiver() {
+
+			@Override
+			public void onReceive(Context context, Intent intent) {
+				// The Latitude data is available as string Extra from the
+				// intent.
+				SuggestionActivity.this.curLatitudeString = intent.getStringExtra(EasyLocation.LATITUDE);
+				SuggestionActivity.this.curLongitudeString = intent.getStringExtra(EasyLocation.LONGITUDE);
+
+				viewSuggestions = new Runnable() {
+					@Override
+					public void run() {
+						getSuggestions();
+					}
+				};
+
+				Thread thread = new Thread(null, viewSuggestions, "MagentoBackground");
+				thread.start();
+			}
+		};
+
+		// Register the Broadcast receiver and use an intent Filter passing in
+		// the AND_EASY_LIB. this filter is universal for the library.
+		registerReceiver(br, new IntentFilter(EasyLocation.AND_EASY_LIB));
 
 		events = new ArrayList<Event>();
 		eventListAdaptor = new EventListAdaptor(this, R.layout.offerlistrow,
@@ -64,15 +101,6 @@ public class SuggestionActivity extends ListActivity {
 		mSpinner.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		mSpinner.setMessage("Loading Suggestions...");
 
-		viewSuggestions = new Runnable() {
-			@Override
-			public void run() {
-				getSuggestions();
-			}
-		};
-
-		Thread thread = new Thread(null, viewSuggestions, "MagentoBackground");
-		thread.start();
 		mSpinner.show();
 	}
 
@@ -82,7 +110,7 @@ public class SuggestionActivity extends ListActivity {
 		public void run() {
 			System.out.println("events.size()" + events.size());
 			if (events != null && events.size() > 0) {
-				eventListAdaptor.notifyDataSetChanged();
+				eventListAdaptor.clear();
 				for (int i = 0; i < events.size(); i++) {
 					eventListAdaptor.add(events.get(i));
 				}
@@ -96,13 +124,32 @@ public class SuggestionActivity extends ListActivity {
 
 		try {
 			events = new ArrayList<Event>();
+			URL url;
+			String urlString = "";
 			
-			URL url = new URL(SERVER_URL_SUGGESTIONS + "id="
-					+ CarpoActivity.FACEBOOK_USER_ID + "&token="
-					+ CarpoActivity.FACEBOOK_TOKEN + "&count="
-					+ suggestionCount);
+			if(this.curLatitudeString == null || this.curLongitudeString == null)
+			{
+				urlString = SERVER_URL_SUGGESTIONS + "id="
+						+ CarpoActivity.FACEBOOK_USER_ID + "&token="
+						+ CarpoActivity.FACEBOOK_TOKEN + "&count="
+						+ suggestionCount;
+				
+				
+			}
+			else {
+				
+				urlString = SERVER_URL_SUGGESTIONS + "id="
+						+ CarpoActivity.FACEBOOK_USER_ID + "&token="
+						+ CarpoActivity.FACEBOOK_TOKEN + "&count="
+						+ suggestionCount + "&lat="
+						+ this.curLatitudeString + "&long="
+						+ this.curLongitudeString;
 
-			Log.d(TAG, url.toString());
+			}
+			
+			Log.d(TAG, urlString);
+			url = new URL(urlString);
+
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 			DocumentBuilder db = dbf.newDocumentBuilder();
 			Document doc = db.parse(new InputSource(url.openStream()));
@@ -200,11 +247,12 @@ public class SuggestionActivity extends ListActivity {
 
 					NodeList textStartTimeList = startTimeElement
 							.getChildNodes();
-					//System.out.println("StartTime : " + ((Node) textStartTimeList.item(0)).getNodeValue().trim());
+					// System.out.println("StartTime : " + ((Node)
+					// textStartTimeList.item(0)).getNodeValue().trim());
 					SimpleDateFormat sdf = new SimpleDateFormat(
 							"yyyy-mm-dd hh:mm:ss");
-					Date date = sdf.parse(((Node) textStartTimeList.item(0)).getNodeValue()
-							.trim());
+					Date date = sdf.parse(((Node) textStartTimeList.item(0))
+							.getNodeValue().trim());
 
 					event.setStartTimeDate(date);
 
@@ -271,7 +319,7 @@ public class SuggestionActivity extends ListActivity {
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 		String item = (String) getListAdapter().getItem(position).toString();
 		Toast.makeText(this, item + " selected", Toast.LENGTH_LONG);
-		Log.d(TAG,"clicked");
+		Log.d(TAG, "clicked");
 	}
 
 	private class OnSkipButtonPressedListner implements OnClickListener {
@@ -309,7 +357,8 @@ public class SuggestionActivity extends ListActivity {
 				TextView tt = (TextView) v.findViewById(R.id.toptext);
 				TextView mt = (TextView) v.findViewById(R.id.middletext);
 				TextView bt = (TextView) v.findViewById(R.id.bottomtext);
-				ImageView imageView = (ImageView)v.findViewById(R.id.event_type_icon);
+				ImageView imageView = (ImageView) v
+						.findViewById(R.id.event_type_icon);
 				if (tt != null) {
 					SimpleDateFormat sdf = new SimpleDateFormat(
 							"yyyy-mm-dd hh:mm:ss");
@@ -324,16 +373,12 @@ public class SuggestionActivity extends ListActivity {
 				if (imageView != null) {
 					if (o.getClass() == Offer.class) {
 						imageView.setImageResource(R.drawable.ic_launcher);
-					}
-					else
-					{
+					} else {
 						imageView.setImageResource(R.drawable.facebook_icon);
 					}
-					
-					
+
 				}
-				
-				
+
 			}
 			return v;
 		}
