@@ -94,13 +94,13 @@ public class suggestions extends HttpServlet {
                         double currentLatUp=currentLat+0.01;
                         double currentLongLeft=currentLong-0.01;
                         double currentLongRight=currentLong+0.01;
-                        if (count==0)   
+                        if (count<=0)   
                             rs=stmt.executeQuery("select * from offer where start_lat>"+currentLatDown+" AND start_lat<"+currentLatUp+" AND start_log>"+currentLongLeft+" AND start_log<"+currentLongRight);
                         else
                             rs=stmt.executeQuery("select * from offer where start_lat>"+currentLatDown+" AND start_lat<"+currentLatUp+" AND start_log>"+currentLongLeft+" AND start_log<"+currentLongRight+" LIMIT "+count);
                         
                     }else{
-                        if(count==0)
+                        if(count<=0)
                             rs=stmt.executeQuery("select * from offer");
                         else
                             rs=stmt.executeQuery("select * from offer LIMIT "+count);
