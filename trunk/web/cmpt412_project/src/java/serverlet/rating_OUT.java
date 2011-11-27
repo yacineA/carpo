@@ -4,81 +4,69 @@
  */
 package serverlet;
 
-import java.sql.*;
-import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.net.URL;
-import java.net.URLConnection;
+import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.json.JSONObject;
 import superclass.Events;
 
 /**
  *
  * @author wen
  */
-@WebServlet(name = "requests_OUT", urlPatterns = {"/requests_out"})
-public class requests_OUT extends HttpServlet {
+@WebServlet(name = "rating_OUT", urlPatterns = {"/rating_out"})
+public class rating_OUT extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
+        PrintWriter out = response.getWriter();
         String id = request.getParameter("id");
         String token = request.getParameter("token");
         boolean isLogged = false;
-        PrintWriter out = response.getWriter();
+        Double temp=0.0;
+        int counter=0;
         try {
-            Events e = new Events();
-            isLogged = e.verify_token(id, token);
-        }catch (Exception e){
-        }finally {
+            Events events = new Events();
+            isLogged = events.verify_token(id, token);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
             out.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-            if(isLogged){
-                out.println("<Requests>");
-                try{
+            if (isLogged) {
+
+                Connection con;
+                try {
                     Class.forName("com.mysql.jdbc.Driver");
-                    Connection con=DriverManager.getConnection("jdbc:mysql://70.64.6.83:3306/test","root","test");
+                    con = DriverManager.getConnection("jdbc:mysql://70.64.6.83:3306/test", "root", "test");
                     Statement stmt = con.createStatement();
-                    ResultSet rs = stmt.executeQuery("select * from request");
-                   
+                    ResultSet rs = stmt.executeQuery("SELECT rating FROM rating WHERE user_id ='" + id + "'");
                     while(rs.next()){
-                        int u_id = rs.getInt("id");                       
-                        String e_stime = rs.getString("start_time");
-                        String e_slat = rs.getString("start_lat");
-                        String e_slon = rs.getString("start_log");
-                        String u_status = rs.getString("status");
-                        String u_creator = rs.getString("creator");
-                        String e_elat = rs.getString("end_lat");
-                        String e_elog = rs.getString("end_log");
-                        
-                        out.println("<Request>");                   
-                        out.println("<id>"+u_id+"</id>");
-                        out.println("<start_time>"+e_stime+"</start_time>");
-                        out.println("<start_lat>"+e_slat+"</start_lat>");
-                        out.println("<start_log>"+e_slon+"</start_log>");
-                        out.println("<status>"+u_status+"</status>");
-                        out.println("<creator>"+u_creator+"</creator>");
-                        out.println("<end_lat>"+e_elat+"</end_lat>");
-                        out.println("<end_log>"+e_elog+"</end_log>");
-                        out.println("</Request>");
-                                                
+                        String r = rs.getString("rating");
+                        temp = temp + Float.valueOf(r.trim()).floatValue();
+                        counter++;
                     }
                     
-                    
-                    
-                }catch(Exception e){
-                    out.print(e.toString());
+                    temp = temp/counter;
+                    out.println("<Ratings>");
+                    out.println("<Rating>");
+                    out.println(temp);
+                    out.println("<Rating>");
+                    out.println("</Ratings>");
+                } catch (Exception ex) {
+                    ex.printStackTrace();
                 }
-                out.println("</Requests>");
-                //out.println(true);
+
             }else{
                 
                 out.println("<Error>");
@@ -89,7 +77,8 @@ public class requests_OUT extends HttpServlet {
             out.close();
         }
     }
- // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
+
+    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /** 
      * Handles the HTTP <code>GET</code> method.
      * @param request servlet request

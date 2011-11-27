@@ -40,7 +40,9 @@ public class requests_IN extends HttpServlet {
         try {
             Events events = new Events();
             isLogged = events.verify_token(id, token);
-        } finally {
+        }catch (Exception e){
+            
+        }finally {
             if (isLogged) {
                 try {
                     Class.forName("com.mysql.jdbc.Driver");
@@ -56,9 +58,11 @@ public class requests_IN extends HttpServlet {
                 }
 
             } else {
-                out.println("<Message>");
-                out.println("false");
-                out.println("</Message");
+                
+                out.println("<Error>");
+                out.println("<id>"+id+"</id>");
+                out.println("</Error>");
+                
             }
             out.close();
         }
