@@ -81,6 +81,7 @@ public class pendStat extends HttpServlet {
             out.print("<Pendings>");
             while (rs.next()) {
                 out.print("<Pending>");
+                
                 String tmpStr = rs.getString("offer_id");
                 out.print("<OfferID>" + tmpStr + "</OfferID>");
                 tmpStr = rs.getString("status");

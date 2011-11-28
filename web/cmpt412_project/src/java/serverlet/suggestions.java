@@ -8,7 +8,9 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.SQLException;
 
+import java.util.LinkedList;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -40,18 +42,22 @@ public class suggestions extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
-        float currentLat=91.0f;//an invalid initial value
-        float currentLong=181.0f;//an invalid initial value
-        int countOffer=-1;
-        int countRequest=-1;
-        if(request.getParameter("lat")!=null)
-            currentLat=Float.parseFloat(request.getParameter("lat"));
-        if(request.getParameter("long")!=null)
-            currentLong=Float.parseFloat(request.getParameter("long"));
-        if(request.getParameter("countOffer")!=null)
-            countOffer=Integer.parseInt(request.getParameter("countOffer"));
-        if(request.getParameter("countRequest")!=null)
-            countRequest=Integer.parseInt(request.getParameter("countRequest"));
+        float currentLat = 91.0f;//an invalid initial value
+        float currentLong = 181.0f;//an invalid initial value
+        int countOffer = -1;
+        int countRequest = -1;
+        if (request.getParameter("lat") != null) {
+            currentLat = Float.parseFloat(request.getParameter("lat"));
+        }
+        if (request.getParameter("long") != null) {
+            currentLong = Float.parseFloat(request.getParameter("long"));
+        }
+        if (request.getParameter("countOffer") != null) {
+            countOffer = Integer.parseInt(request.getParameter("countOffer"));
+        }
+        if (request.getParameter("countRequest") != null) {
+            countRequest = Integer.parseInt(request.getParameter("countRequest"));
+        }
         String id = request.getParameter("id");
         String token = request.getParameter("token");
         String userInfoStr = "";
@@ -84,102 +90,117 @@ public class suggestions extends HttpServlet {
             //out.print("FALSE");
         } finally {
             out.print("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-            if(isLogged){
+            if (isLogged) {
                 out.print("<Suggestions>");
-                try{
+                try {
                     Class.forName("com.mysql.jdbc.Driver");
-                    Connection con=DriverManager.getConnection("jdbc:mysql://70.64.6.83:3306/test","root","test");
-                    Statement stmt=con.createStatement();
-                    ResultSet rs=null;
-                     double currentLatDown;
-                        double currentLatUp;
-                        double currentLongLeft;
-                        double currentLongRight;
-                    if(currentLat>=-90.0f&&currentLat<=90.0f&&currentLong>=-180.0f&&currentLong<=180.0f){
-                        currentLatDown=currentLat-0.01;
-                        currentLatUp=currentLat+0.01;
-                        currentLongLeft=currentLong-0.01;
-                        currentLongRight=currentLong+0.01;
-                        if (countOffer<0)   
-                            rs=stmt.executeQuery("select * from offer where start_lat>"+currentLatDown+" AND start_lat<"+currentLatUp+" AND start_log>"+currentLongLeft+" AND start_log<"+currentLongRight);
-                        else
-                            rs=stmt.executeQuery("select * from offer where start_lat>"+currentLatDown+" AND start_lat<"+currentLatUp+" AND start_log>"+currentLongLeft+" AND start_log<"+currentLongRight+" LIMIT "+countOffer);
-                        
-                    }else{
-                        if(countOffer<0)
-                            rs=stmt.executeQuery("select * from offer");
-                        else
-                            rs=stmt.executeQuery("select * from offer LIMIT "+countOffer);
-                       }
-                    while(rs.next()){
+                    Connection con = DriverManager.getConnection("jdbc:mysql://70.64.6.83:3306/test", "root", "test");
+                    Statement stmt = con.createStatement();
+                    ResultSet rs = null;
+                    /*double currentLatDown;
+                    double currentLatUp;
+                    double currentLongLeft;
+                    double currentLongRight;*/
+                    if (currentLat >= -90.0f && currentLat <= 90.0f && currentLong >= -180.0f && currentLong <= 180.0f) {
+                        /*currentLatDown = currentLat - 0.01;
+                        currentLatUp = currentLat + 0.01;
+                        currentLongLeft = currentLong - 0.01;
+                        currentLongRight = currentLong + 0.01;*/
+                        if (countOffer < 0) {
+                            rs = stmt.executeQuery("select * from offer ORDER BY POWER("+currentLat+"-start_lat, 2)+POWER("+currentLong+"-start_log, 2) ASC");
+                        } else {
+                            rs = stmt.executeQuery("select * from offer ORDER BY POWER("+currentLat+"-start_lat, 2)+POWER("+currentLong+"-start_log, 2) ASC LIMIT " +countOffer);
+                        }
+
+                    } else {
+                        if (countOffer < 0) {
+                            rs = stmt.executeQuery("select * from offer");
+                        } else {
+                            rs = stmt.executeQuery("select * from offer LIMIT " + countOffer);
+                        }
+                    }
+                    
+                    while (rs.next()) {
                         out.print("<Suggestion>");
-                            out.print("<Type>Offer</Type>");
-                            String tmpStr=rs.getString("id");
-                            out.print("<ID>"+tmpStr+"</ID>");
-                            tmpStr=rs.getString("creator");
-                            out.print("<Creator>"+tmpStr+"</Creator>");
-                            tmpStr=rs.getString("start_time");
-                            out.print("<StartTime>"+tmpStr+"</StartTime>");
-                            tmpStr=rs.getString("start_lat");
-                            out.print("<StartLatitude>"+tmpStr+"</StartLatitude>");
-                            tmpStr=rs.getString("start_log");
-                            out.print("<StartLongitude>"+tmpStr+"</StartLongitude>");
-                            tmpStr=rs.getString("status");
-                            out.print("<Status>"+tmpStr+"</Status>");
-                            tmpStr=rs.getString("capacity");
-                            out.print("<Capacity>"+tmpStr+"</Capacity>");
-                            tmpStr=rs.getString("if_share");
-                            out.print("<Shared>"+tmpStr+"</Shared>");
+                        out.print("<Type>Offer</Type>");
+                        String tmpStr = rs.getString("id");
+                        out.print("<ID>" + tmpStr + "</ID>");
+                        tmpStr = rs.getString("creator");
+                        out.print("<Creator>" + tmpStr + "</Creator>");
+                        tmpStr = rs.getString("start_time");
+                        out.print("<StartTime>" + tmpStr + "</StartTime>");
+                        tmpStr = rs.getString("start_lat");
+                        out.print("<StartLatitude>" + tmpStr + "</StartLatitude>");
+                        tmpStr = rs.getString("start_log");
+                        out.print("<StartLongitude>" + tmpStr + "</StartLongitude>");
+                        tmpStr = rs.getString("status");
+                        out.print("<Status>" + tmpStr + "</Status>");
+                        tmpStr = rs.getString("capacity");
+                        out.print("<Capacity>" + tmpStr + "</Capacity>");
+                        tmpStr = rs.getString("if_share");
+                        out.print("<Shared>" + tmpStr + "</Shared>");
                         out.print("</Suggestion>");
                     }
-                    if(currentLat>=-90.0f&&currentLat<=90.0f&&currentLong>=-180.0f&&currentLong<=180.0f){
-                        currentLatDown=currentLat-0.01;
-                        currentLatUp=currentLat+0.01;
-                        currentLongLeft=currentLong-0.01;
-                        currentLongRight=currentLong+0.01;
-                        if (countRequest<0)   
-                            rs=stmt.executeQuery("select * from request where start_lat>"+currentLatDown+" AND start_lat<"+currentLatUp+" AND start_log>"+currentLongLeft+" AND start_log<"+currentLongRight);
-                        else
-                            rs=stmt.executeQuery("select * from request where start_lat>"+currentLatDown+" AND start_lat<"+currentLatUp+" AND start_log>"+currentLongLeft+" AND start_log<"+currentLongRight+" LIMIT "+countRequest);
-                        
-                    }else{
-                          if(countRequest<0)
-                            rs=stmt.executeQuery("select * from request");
-                        else
-                            rs=stmt.executeQuery("select * from request LIMIT "+countRequest);
+                    if (currentLat >= -90.0f && currentLat <= 90.0f && currentLong >= -180.0f && currentLong <= 180.0f) {
+                        /*currentLatDown = currentLat - 0.01;
+                        currentLatUp = currentLat + 0.01;
+                        currentLongLeft = currentLong - 0.01;
+                        currentLongRight = currentLong + 0.01;*/
+                        if (countRequest < 0) {
+                            rs = stmt.executeQuery("select * from request ORDER BY POWER("+currentLat+"-start_lat, 2)+POWER("+currentLong+"-start_log, 2) ASC");
+                        } else {
+                            rs = stmt.executeQuery("select * from request ORDER BY POWER("+currentLat+"-start_lat, 2)+POWER("+currentLong+"-start_log, 2) ASC LIMIT " + countRequest);
+                        }
+
+                    } else {
+                        if (countRequest < 0) {
+                            rs = stmt.executeQuery("select * from request");
+                        } else {
+                            rs = stmt.executeQuery("select * from request LIMIT " + countRequest);
+                        }
                     }
-                    while(rs.next()){
+                    while (rs.next()) {
                         out.print("<Suggestion>");
-                            out.print("<Type>Request</Type>");
-                            String tmpStr=rs.getString("id");
-                            out.print("<ID>"+tmpStr+"</ID>");
-                            tmpStr=rs.getString("creator");
-                            out.print("<Creator>"+tmpStr+"</Creator>");
-                            tmpStr=rs.getString("start_time");
-                            out.print("<StartTime>"+tmpStr+"</StartTime>");
-                            tmpStr=rs.getString("start_lat");
-                            out.print("<StartLatitude>"+tmpStr+"</StartLatitude>");
-                            tmpStr=rs.getString("start_log");
-                            out.print("<StartLongitude>"+tmpStr+"</StartLongitude>");
-                            tmpStr=rs.getString("status");
-                            out.print("<Status>"+tmpStr+"</Status>");
-                            tmpStr=rs.getString("end_lat");
-                            out.print("<EndLatitude>"+tmpStr+"</EndLatitude>");
-                            tmpStr=rs.getString("end_log");
-                            out.print("<EndLongitude>"+tmpStr+"</EndLongitude>");
+                        out.print("<Type>Request</Type>");
+                        String tmpStr = rs.getString("id");
+                        out.print("<ID>" + tmpStr + "</ID>");
+                        tmpStr = rs.getString("creator");
+                        out.print("<Creator>" + tmpStr + "</Creator>");
+                        tmpStr = rs.getString("start_time");
+                        out.print("<StartTime>" + tmpStr + "</StartTime>");
+                        tmpStr = rs.getString("start_lat");
+                        out.print("<StartLatitude>" + tmpStr + "</StartLatitude>");
+                        tmpStr = rs.getString("start_log");
+                        out.print("<StartLongitude>" + tmpStr + "</StartLongitude>");
+                        tmpStr = rs.getString("status");
+                        out.print("<Status>" + tmpStr + "</Status>");
+                        tmpStr = rs.getString("end_lat");
+                        out.print("<EndLatitude>" + tmpStr + "</EndLatitude>");
+                        tmpStr = rs.getString("end_log");
+                        out.print("<EndLongitude>" + tmpStr + "</EndLongitude>");
                         out.print("</Suggestion>");
                     }
-                }catch(Exception sqle){
+                } catch (Exception sqle) {
                     out.print(sqle.getMessage());
                 }
                 out.print("</Suggestions>");
-            }else{
-                 out.print("<Error><ID>1</ID></Error>");
+            } else {
+                out.print("<Error><ID>1</ID></Error>");
             }
             out.close();
         }
     }
-
+/*
+    private LinkedList merge_sort(ResultSet m) throws SQLException{
+        if (m.getRow()==1)
+            return new LinkedList(m.);
+        LinkedList left=new LinkedList();
+        LinkedList right=new LinkedList();
+        LinkedList result=new LinkedList();
+        int middle=m.getRow()/2;
+        
+        return result;
+    }*/
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /** 
      * Handles the HTTP <code>GET</code> method.
