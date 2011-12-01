@@ -59,7 +59,6 @@ public class BaseEventListActivity extends ListActivity {
 		
 		// Start The GPS Service by passing it the main activity.
 		EasyLocation.startGPS(this);
-
 		events = new ArrayList<Event>();
 		eventListAdaptor = new EventListAdaptor(this, R.layout.eventlistrow,
 				events);
@@ -98,6 +97,7 @@ public class BaseEventListActivity extends ListActivity {
 	@Override
     protected void onResume()
 	{
+		super.onResume();
 		// the AND_EASY_LIB. this filter is universal for the library.
 		registerReceiver(br, new IntentFilter(EasyLocation.AND_EASY_LIB));
 	}
@@ -105,22 +105,20 @@ public class BaseEventListActivity extends ListActivity {
 	@Override
 	protected void onPause()
 	{
+		super.onPause();
 		unregisterReceiver(br);
 	}
 	
 	@Override
 	protected void onStop()
 	{
-
-		unregisterReceiver(br);
-		
+		super.onStop();
 	}
 	
 	@Override
 	protected void onDestroy()
 	{
-
-		unregisterReceiver(br);
+		super.onDestroy();
 	}
 	
 	private Runnable returnRes = new Runnable() {
@@ -205,8 +203,8 @@ public class BaseEventListActivity extends ListActivity {
 		Element typeElement = (Element) typeList.item(0);
 
 		NodeList textTypeList = typeElement.getChildNodes();
-
-		if (textTypeList.equals("Offer")) {
+		if (((Node) textTypeList.item(0))
+				.getNodeValue().trim().equals("Offer")) {
 			event = new Offer();
 
 			// ----
@@ -361,9 +359,32 @@ public class BaseEventListActivity extends ListActivity {
 	
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id) {
-		String item = (String) getListAdapter().getItem(position).toString();
-		Toast.makeText(this, item + " selected", Toast.LENGTH_LONG);
-		Log.d(TAG, "clicked");
+		Intent myIntent = new Intent(this,
+				EventDetailedViewActivity.class);
+		Event o = events.get(position);
+		
+		myIntent.putExtra("ID", o.getId());
+		myIntent.putExtra("CREATOR", o.getCreator());
+		myIntent.putExtra("START_TIME_DATE", o.getStartTimeDate());
+		myIntent.putExtra("START_LAT", o.getStartLat());
+		myIntent.putExtra("START_LOG", o.getStartLog());
+		myIntent.putExtra("END_LAT", o.getEndLat());
+		myIntent.putExtra("END_LOG", o.getEndLog());
+		myIntent.putExtra("STATUS", o.isStatus());
+		
+		if(o.getClass() == Offer.class)
+		{
+			myIntent.putExtra("CAPACITY",((Offer)o).getCapacity() );
+			myIntent.putExtra("SHARED", ((Offer)o).isShared());
+			myIntent.putExtra("TYPE", "Offer");
+		}
+		else if (o.getClass() == Request.class) 
+		{
+			myIntent.putExtra("TYPE", "Request");
+		}
+		
+
+		this.startActivity(myIntent);
 	}
 	
 	class EventListAdaptor extends ArrayAdapter<Event> {

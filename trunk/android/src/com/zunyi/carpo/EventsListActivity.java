@@ -62,7 +62,7 @@ public class EventsListActivity extends BaseEventListActivity {
 		
 	}
 	
-	  @Override  
+	  @Override
 	  public boolean onCreateOptionsMenu(Menu menu) {   
 	    menu.add(group1Id,searchBtnId ,searchBtnId,"Add");   
 	    menu.add(group2Id,scheduleBtnId ,scheduleBtnId,"Get Events Near Me");   

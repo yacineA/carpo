@@ -65,7 +65,6 @@ public class SuggestionActivity extends BaseEventListActivity {
 					MainMenuActivity.class);
 			SuggestionActivity.this.startActivity(myIntent);
 			EasyLocation.stopGPS();
-			unregisterReceiver(br);
 			finish();
 		}
 

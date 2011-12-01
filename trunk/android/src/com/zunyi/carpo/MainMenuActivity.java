@@ -43,7 +43,7 @@ public class MainMenuActivity extends Activity {
 		@Override
 		public void onClick(View v) {
 			Intent myIntent = new Intent(MainMenuActivity.this,
-					OfferListActivity.class);
+					RequestListActivity.class);
 			MainMenuActivity.this.startActivity(myIntent);
 
 		}

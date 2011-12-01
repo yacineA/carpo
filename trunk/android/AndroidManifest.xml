@@ -33,11 +33,19 @@
         </activity>
         <activity
             android:label="@string/app_name"
+            android:name=".RequestListActivity" >
+        </activity>
+        <activity
+            android:label="@string/app_name"
             android:name=".BaseEventListActivity" >
         </activity>
         <activity
             android:label="@string/app_name"
             android:name=".EventsListActivity" >
+        </activity>
+        <activity
+            android:label="@string/app_name"
+            android:name=".EventDetailedViewActivity" >
         </activity>
     </application>
 
