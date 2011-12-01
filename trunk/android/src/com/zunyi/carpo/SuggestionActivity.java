@@ -44,22 +44,15 @@ public class SuggestionActivity extends BaseEventListActivity {
 				+ requestSuggestionCount;
 		TAG = "SUGGESTION_ACTIVITY";
 		
-		events = new ArrayList<Event>();
-		eventListAdaptor = new EventListAdaptor(this, R.layout.eventlistrow,
-				events);
-		setListAdapter(eventListAdaptor);
+		contentXMLNodeElement = "Suggestion";
+		
 
 		skipButton = (Button) findViewById(R.id.skipButton);
 		skipButton.setOnClickListener(new OnSkipButtonPressedListner());
 
-		mSpinner = new ProgressDialog(this);
-		mSpinner.requestWindowFeature(Window.FEATURE_NO_TITLE);
-		mSpinner.setMessage("Loading Suggestions...");
 
-		mSpinner.show();
+		getEventsFromServer();
 	}
-
-
 
 
 
@@ -72,7 +65,7 @@ public class SuggestionActivity extends BaseEventListActivity {
 					MainMenuActivity.class);
 			SuggestionActivity.this.startActivity(myIntent);
 			EasyLocation.stopGPS();
-			unregisterReceiver()
+			unregisterReceiver(br);
 			finish();
 		}
 

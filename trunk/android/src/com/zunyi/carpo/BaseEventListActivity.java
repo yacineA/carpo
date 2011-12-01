@@ -1,6 +1,7 @@
 package com.zunyi.carpo;
 
 import java.net.URL;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -31,6 +32,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -42,9 +44,11 @@ public class BaseEventListActivity extends ListActivity {
 	ProgressDialog mSpinner;
 	ArrayList<Event> events = null;
 	EventListAdaptor eventListAdaptor = null;
-	Runnable viewSuggestions;
+	Runnable viewEvents;
 	String curLatitudeString = null;
 	String curLongitudeString = null;
+	String contentXMLNodeElement = null;
+	BroadcastReceiver br;
 	
 	static String SERVER_URL;
 	static String TAG;
@@ -56,9 +60,14 @@ public class BaseEventListActivity extends ListActivity {
 		// Start The GPS Service by passing it the main activity.
 		EasyLocation.startGPS(this);
 
+		events = new ArrayList<Event>();
+		eventListAdaptor = new EventListAdaptor(this, R.layout.eventlistrow,
+				events);
+		setListAdapter(eventListAdaptor);
+		
 		// Create a Broadcast Reciver for using the library, it is needed for
 		// every module, as all the available data is brodcasted as intents.
-		BroadcastReceiver br = new BroadcastReceiver() {
+		br = new BroadcastReceiver() {
 
 			@Override
 			public void onReceive(Context context, Intent intent) {
@@ -67,20 +76,7 @@ public class BaseEventListActivity extends ListActivity {
 				BaseEventListActivity.this.curLatitudeString = intent
 						.getStringExtra(EasyLocation.LATITUDE);
 				BaseEventListActivity.this.curLongitudeString = intent
-						.getStringExtra(EasyLocation.LONGITUDE);
-
-				viewSuggestions = new Runnable() {
-					@Override
-					public void run() {
-						getSuggestions();
-					}
-				};
-
-				Thread thread = new Thread(null, viewSuggestions,
-						"MagentoBackground");
-				thread.start();
-				
-				
+						.getStringExtra(EasyLocation.LONGITUDE);	
 
 			}
 		};
@@ -89,8 +85,43 @@ public class BaseEventListActivity extends ListActivity {
 		// Register the Broadcast receiver and use an intent Filter passing in
 		// the AND_EASY_LIB. this filter is universal for the library.
 		registerReceiver(br, new IntentFilter(EasyLocation.AND_EASY_LIB));
+		
+		mSpinner = new ProgressDialog(this);
+		mSpinner.requestWindowFeature(Window.FEATURE_NO_TITLE);
+		mSpinner.setMessage("Loading...");
+
+		mSpinner.show();
+		
 	}
 	
+
+	@Override
+    protected void onResume()
+	{
+		// the AND_EASY_LIB. this filter is universal for the library.
+		registerReceiver(br, new IntentFilter(EasyLocation.AND_EASY_LIB));
+	}
+	
+	@Override
+	protected void onPause()
+	{
+		unregisterReceiver(br);
+	}
+	
+	@Override
+	protected void onStop()
+	{
+
+		unregisterReceiver(br);
+		
+	}
+	
+	@Override
+	protected void onDestroy()
+	{
+
+		unregisterReceiver(br);
+	}
 	
 	private Runnable returnRes = new Runnable() {
 
@@ -108,28 +139,12 @@ public class BaseEventListActivity extends ListActivity {
 		}
 	};
 
-	private void getSuggestions() {
+	void getListContent() {
 
 		try {
 			events = new ArrayList<Event>();
 			URL url;
-			String urlString = "";
-
-			if (this.curLatitudeString == null
-					|| this.curLongitudeString == null) {
-				urlString = SERVER_URL + "&id="
-						+ CarpoActivity.FACEBOOK_USER_ID + "&token="
-						+ CarpoActivity.FACEBOOK_TOKEN;
-
-			} else {
-
-				urlString = SERVER_URL + "&id="
-						+ CarpoActivity.FACEBOOK_USER_ID + "&token="
-						+ CarpoActivity.FACEBOOK_TOKEN + "&lat="
-						+ this.curLatitudeString + "&long="
-						+ this.curLongitudeString;
-
-			}
+			String urlString = getContentURL();
 
 			Log.d(TAG, urlString);
 			url = new URL(urlString);
@@ -139,152 +154,16 @@ public class BaseEventListActivity extends ListActivity {
 			Document doc = db.parse(new InputSource(url.openStream()));
 			doc.getDocumentElement().normalize();
 
-			NodeList suggestionList = doc.getElementsByTagName("Suggestion");
-			int totalSuggestion = suggestionList.getLength();
-			System.out.println("Total no of suggestions : " + totalSuggestion);
+			NodeList eventList = doc.getElementsByTagName(contentXMLNodeElement);
+			int totalEvents = eventList.getLength();
+			System.out.println("Total no of suggestions : " + totalEvents);
 
-			for (int s = 0; s < totalSuggestion; s++) {
+			for (int s = 0; s < totalEvents; s++) {
 
-				Node suggestionNode = suggestionList.item(s);
-				if (suggestionNode.getNodeType() == Node.ELEMENT_NODE) {
+				Node eventNode = eventList.item(s);
+				if (eventNode.getNodeType() == Node.ELEMENT_NODE) {
 
-					Event event;
-					Element suggestionElement = (Element) suggestionNode;
-
-					// -------
-					NodeList typeList = suggestionElement
-							.getElementsByTagName("Type");
-					Element typeElement = (Element) typeList.item(0);
-
-					NodeList textTypeList = typeElement.getChildNodes();
-
-					if (textTypeList.equals("Offer")) {
-						event = new Offer();
-
-						// ----
-						NodeList capacityList = suggestionElement
-								.getElementsByTagName("Capacity");
-						Element capacityElement = (Element) capacityList
-								.item(0);
-
-						NodeList textCapacityList = capacityElement
-								.getChildNodes();
-						int capacity = Integer
-								.parseInt(((Node) textCapacityList.item(0))
-										.getNodeValue().trim());
-						// System.out.println("Capacity : " +
-						// ((Node)textCapacityList.item(0)).getNodeValue().trim());
-						((Offer) event).setCapacity(capacity);
-						// ------
-
-						// ----
-						NodeList sharedList = suggestionElement
-								.getElementsByTagName("Shared");
-						Element sharedElement = (Element) sharedList.item(0);
-
-						NodeList textSharedList = sharedElement.getChildNodes();
-						boolean isShared = ((Node) textSharedList.item(0))
-								.getNodeValue().trim().equals(1) ? true : false;
-						((Offer) event).setShared(isShared);
-						// System.out.println("Shared : " +
-						// ((Node)textSharedList.item(0)).getNodeValue().trim());
-
-						// ------
-					} else {
-						event = new Request();
-
-					}
-					// System.out.println("Type : " +
-					// ((Node)textTypeList.item(0)).getNodeValue().trim());
-
-					// -------
-					NodeList idList = suggestionElement
-							.getElementsByTagName("ID");
-					Element idElement = (Element) idList.item(0);
-
-					NodeList textIDList = idElement.getChildNodes();
-					int id = Integer.parseInt(((Node) textIDList.item(0))
-							.getNodeValue().trim());
-					// System.out.println("ID : " +
-					// ((Node)textIDList.item(0)).getNodeValue().trim());
-					event.setId(id);
-
-					// ----
-					NodeList creatorList = suggestionElement
-							.getElementsByTagName("Creator");
-					Element creatorElement = (Element) creatorList.item(0);
-
-					NodeList textCreatorList = creatorElement.getChildNodes();
-					int creator = Integer.parseInt(((Node) textCreatorList
-							.item(0)).getNodeValue().trim());
-					// System.out.println("Creator : " +
-					// ((Node)textCreatorList.item(0)).getNodeValue().trim());
-					event.setCreator(creator);
-
-					// ------
-
-					// ----
-
-					NodeList startTimeList = suggestionElement
-							.getElementsByTagName("StartTime");
-					Element startTimeElement = (Element) startTimeList.item(0);
-
-					NodeList textStartTimeList = startTimeElement
-							.getChildNodes();
-					// System.out.println("StartTime : " + ((Node)
-					// textStartTimeList.item(0)).getNodeValue().trim());
-					SimpleDateFormat sdf = new SimpleDateFormat(
-							"yyyy-mm-dd hh:mm:ss");
-					Date date = sdf.parse(((Node) textStartTimeList.item(0))
-							.getNodeValue().trim());
-
-					event.setStartTimeDate(date);
-
-					// ------
-
-					// ----
-					NodeList startLatitudeList = suggestionElement
-							.getElementsByTagName("StartLatitude");
-					Element startLatitudeElement = (Element) startLatitudeList
-							.item(0);
-
-					NodeList textStartLatitudeList = startLatitudeElement
-							.getChildNodes();
-					float lat = Float.parseFloat(((Node) textStartLatitudeList
-							.item(0)).getNodeValue().trim());
-					// System.out.println("StartTime : " +
-					// ((Node)textStartLatitudeList.item(0)).getNodeValue().trim());
-					event.setStartLat(lat);
-					// ------
-
-					// ----
-					NodeList startLongitudeList = suggestionElement
-							.getElementsByTagName("StartLongitude");
-					Element startLongitudeElement = (Element) startLongitudeList
-							.item(0);
-
-					NodeList textStartLongitudeList = startLongitudeElement
-							.getChildNodes();
-					float log = Float.parseFloat(((Node) textStartLongitudeList
-							.item(0)).getNodeValue().trim());
-					// System.out.println("Longitude : " +
-					// ((Node)textStartLongitudeList.item(0)).getNodeValue().trim());
-					event.setStartLog(log);
-					// ------
-
-					// ----
-					NodeList statusList = suggestionElement
-							.getElementsByTagName("Status");
-					Element statusElement = (Element) statusList.item(0);
-
-					NodeList textStatusList = statusElement.getChildNodes();
-
-					boolean status = ((Node) textStatusList.item(0))
-							.getNodeValue().trim().equals("1") ? true : false;
-					// System.out.println("Status : " +
-					// ((Node)textStatusList.item(0)).getNodeValue().trim());
-					event.setStatus(status);
-					// ------
+					Event event = getEventFrom(eventNode);
 
 					events.add(event);
 
@@ -297,6 +176,187 @@ public class BaseEventListActivity extends ListActivity {
 		}
 
 		runOnUiThread(returnRes);
+		
+		
+	}
+
+
+	void getEventsFromServer() {
+		viewEvents = new Runnable() {
+			@Override
+			public void run() {
+				getListContent();
+			}
+		};
+
+		Thread thread = new Thread(null, viewEvents,
+				"MagentoBackground");
+		thread.start();
+	}
+
+	
+	Event getEventFrom(Node eventNode) throws ParseException {
+		Event event;
+		Element suggestionElement = (Element) eventNode;
+
+		// -------
+		NodeList typeList = suggestionElement
+				.getElementsByTagName("Type");
+		Element typeElement = (Element) typeList.item(0);
+
+		NodeList textTypeList = typeElement.getChildNodes();
+
+		if (textTypeList.equals("Offer")) {
+			event = new Offer();
+
+			// ----
+			NodeList capacityList = suggestionElement
+					.getElementsByTagName("Capacity");
+			Element capacityElement = (Element) capacityList
+					.item(0);
+
+			NodeList textCapacityList = capacityElement
+					.getChildNodes();
+			int capacity = Integer
+					.parseInt(((Node) textCapacityList.item(0))
+							.getNodeValue().trim());
+			// System.out.println("Capacity : " +
+			// ((Node)textCapacityList.item(0)).getNodeValue().trim());
+			((Offer) event).setCapacity(capacity);
+			// ------
+
+			// ----
+			NodeList sharedList = suggestionElement
+					.getElementsByTagName("Shared");
+			Element sharedElement = (Element) sharedList.item(0);
+
+			NodeList textSharedList = sharedElement.getChildNodes();
+			boolean isShared = ((Node) textSharedList.item(0))
+					.getNodeValue().trim().equals(1) ? true : false;
+			((Offer) event).setShared(isShared);
+			// System.out.println("Shared : " +
+			// ((Node)textSharedList.item(0)).getNodeValue().trim());
+
+			// ------
+		} else {
+			event = new Request();
+
+		}
+		// System.out.println("Type : " +
+		// ((Node)textTypeList.item(0)).getNodeValue().trim());
+
+		// -------
+		NodeList idList = suggestionElement
+				.getElementsByTagName("ID");
+		Element idElement = (Element) idList.item(0);
+
+		NodeList textIDList = idElement.getChildNodes();
+		int id = Integer.parseInt(((Node) textIDList.item(0))
+				.getNodeValue().trim());
+		// System.out.println("ID : " +
+		// ((Node)textIDList.item(0)).getNodeValue().trim());
+		event.setId(id);
+
+		// ----
+		NodeList creatorList = suggestionElement
+				.getElementsByTagName("Creator");
+		Element creatorElement = (Element) creatorList.item(0);
+
+		NodeList textCreatorList = creatorElement.getChildNodes();
+		int creator = Integer.parseInt(((Node) textCreatorList
+				.item(0)).getNodeValue().trim());
+		// System.out.println("Creator : " +
+		// ((Node)textCreatorList.item(0)).getNodeValue().trim());
+		event.setCreator(creator);
+
+		// ------
+
+		// ----
+
+		NodeList startTimeList = suggestionElement
+				.getElementsByTagName("StartTime");
+		Element startTimeElement = (Element) startTimeList.item(0);
+
+		NodeList textStartTimeList = startTimeElement
+				.getChildNodes();
+		// System.out.println("StartTime : " + ((Node)
+		// textStartTimeList.item(0)).getNodeValue().trim());
+		SimpleDateFormat sdf = new SimpleDateFormat(
+				"yyyy-mm-dd hh:mm:ss");
+		Date date = sdf.parse(((Node) textStartTimeList.item(0))
+				.getNodeValue().trim());
+
+		event.setStartTimeDate(date);
+
+		// ------
+
+		// ----
+		NodeList startLatitudeList = suggestionElement
+				.getElementsByTagName("StartLatitude");
+		Element startLatitudeElement = (Element) startLatitudeList
+				.item(0);
+
+		NodeList textStartLatitudeList = startLatitudeElement
+				.getChildNodes();
+		float lat = Float.parseFloat(((Node) textStartLatitudeList
+				.item(0)).getNodeValue().trim());
+		// System.out.println("StartTime : " +
+		// ((Node)textStartLatitudeList.item(0)).getNodeValue().trim());
+		event.setStartLat(lat);
+		// ------
+
+		// ----
+		NodeList startLongitudeList = suggestionElement
+				.getElementsByTagName("StartLongitude");
+		Element startLongitudeElement = (Element) startLongitudeList
+				.item(0);
+
+		NodeList textStartLongitudeList = startLongitudeElement
+				.getChildNodes();
+		float log = Float.parseFloat(((Node) textStartLongitudeList
+				.item(0)).getNodeValue().trim());
+		// System.out.println("Longitude : " +
+		// ((Node)textStartLongitudeList.item(0)).getNodeValue().trim());
+		event.setStartLog(log);
+		// ------
+
+		// ----
+		NodeList statusList = suggestionElement
+				.getElementsByTagName("Status");
+		Element statusElement = (Element) statusList.item(0);
+
+		NodeList textStatusList = statusElement.getChildNodes();
+
+		boolean status = ((Node) textStatusList.item(0))
+				.getNodeValue().trim().equals("1") ? true : false;
+		// System.out.println("Status : " +
+		// ((Node)textStatusList.item(0)).getNodeValue().trim());
+		event.setStatus(status);
+		// ------
+		return event;
+	}
+
+	
+	String getContentURL() {
+		String urlString = "";
+
+		
+		if (this.curLatitudeString == null
+				|| this.curLongitudeString == null) {
+			urlString = SERVER_URL + "&id="
+					+ CarpoActivity.FACEBOOK_USER_ID + "&token="
+					+ CarpoActivity.FACEBOOK_TOKEN;
+
+		} else {
+
+			urlString = SERVER_URL + "&id="
+					+ CarpoActivity.FACEBOOK_USER_ID + "&token="
+					+ CarpoActivity.FACEBOOK_TOKEN + "&lat="
+					+ this.curLatitudeString + "&long="
+					+ this.curLongitudeString;
+
+		}
+		return urlString;
 	}
 	
 	@Override
