@@ -59,15 +59,17 @@ public class requests_OUT extends HttpServlet {
                         String e_elat = rs.getString("end_lat");
                         String e_elog = rs.getString("end_log");
                         
-                        out.println("<Request>");                   
-                        out.println("<id>"+u_id+"</id>");
-                        out.println("<start_time>"+e_stime+"</start_time>");
-                        out.println("<start_lat>"+e_slat+"</start_lat>");
-                        out.println("<start_log>"+e_slon+"</start_log>");
-                        out.println("<status>"+u_status+"</status>");
-                        out.println("<creator>"+u_creator+"</creator>");
-                        out.println("<end_lat>"+e_elat+"</end_lat>");
-                        out.println("<end_log>"+e_elog+"</end_log>");
+                        out.println("<Request>");   
+                        out.println("<Type>Request</Type>");
+                        out.println("<ID>"+u_id+"</ID>");
+                        out.println("<Creator>"+u_creator+"</Creator>");
+                        out.println("<StartTime>"+e_stime+"</StartTime>");
+                        out.println("<StartLatitude>"+e_slat+"</StartLatitude>");
+                        out.println("<StartLongitude>"+e_slon+"</StartLongitude>");
+                        out.println("<Status>"+u_status+"</Status>");
+                        
+                        out.println("<EndLatitude>"+e_elat+"</EndLatitude>");
+                        out.println("<EndLongitude>"+e_elog+"</EndLongitude>");
                         out.println("</Request>");
                                                 
                     }
