@@ -139,6 +139,10 @@ public class suggestions extends HttpServlet {
                         out.print("<Capacity>" + tmpStr + "</Capacity>");
                         tmpStr = rs.getString("if_share");
                         out.print("<Shared>" + tmpStr + "</Shared>");
+                         tmpStr = rs.getString("end_lat");
+                        out.print("<EndLatitude>" + tmpStr + "</Endlatitude>");
+                         tmpStr = rs.getString("end_log");
+                        out.print("<EndLongitude>" + tmpStr + "</EndLongitude>");
                         out.print("</Suggestion>");
                     }
                     if (currentLat >= -90.0f && currentLat <= 90.0f && currentLong >= -180.0f && currentLong <= 180.0f) {

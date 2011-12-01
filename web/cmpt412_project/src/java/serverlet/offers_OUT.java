@@ -58,17 +58,18 @@ public class offers_OUT extends HttpServlet {
                         String e_elat = rs.getString("end_lat");
                         String e_elog = rs.getString("end_log");
                         
-                        out.println("<Offer>");                   
-                        out.println("<id>"+u_id+"</id>");
-                        out.println("<creator>"+e_creator+"</creator>");
-                        out.println("<start_time>"+e_stime+"</start_time>");
-                        out.println("<start_lat>"+e_slat+"</start_lat>");
-                        out.println("<start_log>"+e_slon+"</start_log>");
-                        out.println("<status>"+u_status+"</status>");
-                        out.println("<capacity>"+u_capcity+"</capacity>");
-                        out.println("<if_share>"+u_share+"if_share");
-                        out.println("<end_lat>"+e_elat+"</end_lat>");
-                        out.println("<end_log>"+e_elog+"</end_log>");
+                        out.println("<Offer>");          
+                        out.println("<Type>Offer<Type>");
+                        out.println("<ID>"+u_id+"</ID>");
+                        out.println("<Creator>"+e_creator+"</Creator>");
+                        out.println("<StartTime>"+e_stime+"</StartTime>");
+                        out.println("<StartLatitude>"+e_slat+"</StartLatitude>");
+                        out.println("<StartLongitude>"+e_slon+"</StartLongitude>");
+                        out.println("<Status>"+u_status+"</Status>");
+                        out.println("<Capacity>"+u_capcity+"</Capacity>");
+                        out.println("<Shared>"+u_share+"Shared");
+                        out.println("<EndLatitude>"+e_elat+"</EndLatitude>");
+                        out.println("<EndLongitude>"+e_elog+"</EndLongitude>");
                         out.println("</Offer>");
                                                 
                     }
