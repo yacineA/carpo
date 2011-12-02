@@ -42,7 +42,7 @@ public class join extends HttpServlet {
         PrintWriter out = response.getWriter();
         out.print("<Result>");
         try {
-            if (request.getParameter("id") == null || request.getParameter("token") == null || request.getParameter("offerid") == null) {
+            if (request.getParameter("id") == null || request.getParameter("token") == null || request.getParameter("offerId") == null) {
                 throw new Exception("Missing parameters!");
             }
             String id = request.getParameter("id");
@@ -75,20 +75,27 @@ public class join extends HttpServlet {
             Class.forName("com.mysql.jdbc.Driver");
             Connection con = DriverManager.getConnection("jdbc:mysql://70.64.6.83:3306/test", "root", "test");
             Statement stmt = con.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT * from user_info where id="+id);
-            if(!rs.next())
+            ResultSet rs = stmt.executeQuery("SELECT * from user_info where id=" + id);
+            if (!rs.next()) {
                 throw new Exception("User not registered.");
-            stmt.executeQuery("SELECT * from offer where id="+offerId);
-            if(!rs.next())
-                throw new Exception("Offer with id "+offerId+" not found.");
-            stmt.executeUpdate("INSERT INTO test.joined_passenger (offer_id, user_id, status) VALUES ("+offerId+", "+id+", 1)");
-            out.print("<Message>true</Message>");
+            }
+            rs = stmt.executeQuery("SELECT * from offer where id=" + offerId);
+            if (!rs.next()) {
+                throw new Exception("Offer with id " + offerId + " not found.");
+            }
+            rs = stmt.executeQuery("Select * from test.joined_passenger where offer_id=" + offerId + " AND user_id=" + id);
+            if (rs.first()) {
+                out.print("<Message>already</Message>");
+            } else {
+                stmt.executeUpdate("INSERT INTO test.joined_passenger (offer_id, user_id, status) VALUES (" + offerId + ", " + id + ", 1)");
+                out.print("<Message>true</Message>");
+            }
         } catch (Exception e) {
             out.print("<Error>" + e.toString() + "</Error>");
         } finally {
             out.print("</Result>");
             out.close();
-        }   
+        }
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

@@ -140,7 +140,7 @@ public class suggestions extends HttpServlet {
                         tmpStr = rs.getString("if_share");
                         out.print("<Shared>" + tmpStr + "</Shared>");
                          tmpStr = rs.getString("end_lat");
-                        out.print("<EndLatitude>" + tmpStr + "</Endlatitude>");
+                        out.print("<EndLatitude>" + tmpStr + "</EndLatitude>");
                          tmpStr = rs.getString("end_log");
                         out.print("<EndLongitude>" + tmpStr + "</EndLongitude>");
                         out.print("</Suggestion>");
