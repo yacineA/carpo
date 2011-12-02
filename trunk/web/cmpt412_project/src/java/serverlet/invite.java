@@ -39,14 +39,14 @@ public class invite extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
-        out.print("<Result>");
+         out.print("<Result>");
         try {
-            if (request.getParameter("id") == null || request.getParameter("token") == null || request.getParameter("offerId") == null) {
+            if (request.getParameter("id") == null || request.getParameter("token") == null || request.getParameter("psgId") == null) {
                 throw new Exception("Missing parameters!");
             }
             String id = request.getParameter("id");
             String token = request.getParameter("token");
-            String offerId = request.getParameter("offerId");
+            String psgId = request.getParameter("offerId");
             String userInfoStr = "";
             try {
                 URL url = new URL("https://graph.facebook.com/" + id + "?fields=username,updated_time&access_token=" + token);
@@ -78,15 +78,31 @@ public class invite extends HttpServlet {
             if (!rs.next()) {
                 throw new Exception("User not registered.");
             }
-            rs = stmt.executeQuery("SELECT * from offer where id=" + offerId);
+            rs = stmt.executeQuery("SELECT * from offer where creator=" + id);
             if (!rs.next()) {
-                throw new Exception("Offer with id " + offerId + " not found.");
+                throw new Exception("You have not created any offers.");
             }
-            rs = stmt.executeQuery("Select * from test.joined_passenger where offer_id=" + offerId + " AND user_id=" + id);
-            if (rs.first()) {
+            int offerId[] = null;
+            int i = 0;
+            do {
+                offerId[i] = rs.getInt("id");
+                i++;
+            } while (rs.next());
+            rs = stmt.executeQuery("SELECT * from joined_passenger where user_id=" + psgId);
+            boolean isInvited = false;
+            while (rs.next()) {
+                for (int j = 0; j < i + 1; j++) {
+                    if (rs.getInt("offer_id") == offerId[j]) {
+                        isInvited = true;
+                        break;
+                    }
+                }
+            }
+            //rs = stmt.executeQuery("Select * from test.joined_passenger where offer_id=" + offerId + " AND user_id=" + id);
+            if (isInvited) {
                 out.print("<Message>already</Message>");
             } else {
-                stmt.executeUpdate("INSERT INTO test.joined_passenger (offer_id, user_id, status) VALUES (" + offerId + ", " + id + ", 1)");
+                stmt.executeUpdate("INSERT INTO test.joined_passenger (offer_id, user_id, status) VALUES (" + offerId + ", " + psgId + ", 3)");
                 out.print("<Message>true</Message>");
             }
         } catch (Exception e) {

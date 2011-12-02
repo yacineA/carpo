@@ -39,17 +39,20 @@ public class confirm extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-       response.setContentType("text/html;charset=UTF-8");
+        response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
         out.print("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Result>");
         try {
-            if (request.getParameter("id") == null || request.getParameter("token") == null|| request.getParameter("pendingId")==null||request.getParameter("updateStatus")==null) {
+            if (request.getParameter("id") == null || request.getParameter("token") == null || request.getParameter("pendingId") == null || request.getParameter("updateStatus") == null) {
                 throw new Exception("Missing parameters!");
             }
-            String id = request.getParameter("id");
+            int id = Integer.getInteger(request.getParameter("id"));
             String token = request.getParameter("token");
-            String pendingId=request.getParameter("pendingId");
-            String updateStatus=request.getParameter("updateStatus");
+            String pendingId = request.getParameter("pendingId");
+            int updateStatus = Integer.getInteger(request.getParameter("updateStatus"));
+            if (updateStatus == 3||updateStatus==1) {
+                throw new Exception("status parameter error");
+            }
             String userInfoStr = "";
             try {
                 URL url = new URL("https://graph.facebook.com/" + id + "?fields=username,updated_time&access_token=" + token);
@@ -81,16 +84,23 @@ public class confirm extends HttpServlet {
                 throw new Exception("User not registered.");
             }
             rs = stmt.executeQuery("SELECT * from test.joined_passenger where id=" + pendingId);
-            String offerId=rs.getString("offer_id");
-            rs=stmt.executeQuery("Select * from test.offer wher id="+offerId);
-            if(!id.equals(rs.getString("creator"))){
-                throw new Exception("You are not the driver who created the offer related to this pending.");
-            }else{
-                stmt.executeUpdate("UPDATE test.joined_passenger SET `status` = "+updateStatus+" WHERE id ="+pendingId);
-                out.print("<Message>true</Message>");
+            if (rs.getInt("status") == 3) {//Passenger confirm driver's invitation
+                if (rs.getInt("user_id") != id) {
+                    throw new Exception("user id in pending does not match to passenger id");
+                }
+                stmt.executeUpdate("UPDATE test.joined_passenger SET `status` = " + updateStatus + " WHERE id =" + pendingId);
+            } else {//Driver confirms passenger's request
+                String offerId = rs.getString("offer_id");
+                rs = stmt.executeQuery("Select * from test.offer wher id=" + offerId);
+                if (id != rs.getInt("creator")) {
+                    throw new Exception("You are not the driver who created the offer related to this pending.");
+                } else {
+                    stmt.executeUpdate("UPDATE test.joined_passenger SET `status` = " + updateStatus + " WHERE id =" + pendingId + " AND status<>3");
+                    out.print("<Message>true</Message>");
+                }
+
             }
-            
-            
+
         } catch (Exception e) {
             out.print("<Error>" + e.toString() + "</Error>");
         } finally {
