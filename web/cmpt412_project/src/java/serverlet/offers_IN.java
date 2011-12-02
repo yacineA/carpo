@@ -46,15 +46,49 @@ public class offers_IN extends HttpServlet {
         String share = request.getParameter("if_share");
         String elat = request.getParameter("end_lat");
         String elog = request.getParameter("end_log");
+        String start_address = convert(slat, slog);
+        String end_address = convert(elat, elog);
+
+
+        boolean isLogged = false;
+        try {
+
+            Events events = new Events();
+            isLogged = events.verify_token(id, token);
+
+        } catch (Exception e) {
+        } finally {
+            if (isLogged) {
+                try {
+                    Class.forName("com.mysql.jdbc.Driver");
+                    Connection con = DriverManager.getConnection("jdbc:mysql://70.64.6.83:3306/test", "root", "test");
+                    Statement stmt = con.createStatement();
+
+                    stmt.executeUpdate("INSERT INTO test.offer ( creator, start_time, start_lat, start_log, status, capacity, if_share, end_lat, end_log, start_address, end_address)VALUES "
+                            + "('" + id + "', '" + stime + "','" + slat + "','" + slog + "','" + status + "','" + capacity + "', '" + share + "', '" + elat + "', '" + elog + "', '" + start_address + "', '" + end_address + "')");
+                    out.println("<Message>");
+                    out.println("true");
+                    out.println("</Message");
+                } catch (Exception e) {
+                }
+
+            } else {
+                out.println("<Message>");
+                out.println("false");
+                out.println("</Message");
+            }
+            out.close();
+        }
+    }
+    
+    private String convert(String lat, String log){
         String address="";
         
-
         URL url = null;
-
         HttpURLConnection httpurlconnection = null;
 
         try {
-            url = new URL("http://maps.google.com/maps/api/geocode/xml?latlng="+slat+","+slog+"&sensor=true");
+            url = new URL("http://maps.google.com/maps/api/geocode/xml?latlng="+lat+","+log+"&sensor=true");
             
             httpurlconnection = (HttpURLConnection) url.openConnection();
             httpurlconnection.setDoOutput(true);
@@ -83,40 +117,8 @@ public class offers_IN extends HttpServlet {
                 httpurlconnection.disconnect();
             }
         }
-
-
-        boolean isLogged = false;
-        try {
-
-            Events events = new Events();
-            isLogged = events.verify_token(id, token);
-
-        } catch (Exception e) {
-        } finally {
-            if (isLogged) {
-                try {
-                    Class.forName("com.mysql.jdbc.Driver");
-                    Connection con = DriverManager.getConnection("jdbc:mysql://70.64.6.83:3306/test", "root", "test");
-                    Statement stmt = con.createStatement();
-
-                    stmt.executeUpdate("INSERT INTO test.offer ( creator, start_time, start_lat, start_log, status, capacity, if_share, end_lat, end_log, address)VALUES "
-                            + "('" + id + "', '" + stime + "','" + slat + "','" + slog + "','" + status + "','" + capacity + "', '" + share + "', '" + elat + "', '" + elog + "', '" + address + "')");
-                    out.println("<Message>");
-                    out.println("true");
-                    out.println("</Message");
-                } catch (Exception e) {
-                }
-
-            } else {
-                out.println("<Message>");
-                out.println("false");
-                out.println("</Message");
-            }
-            out.close();
-        }
-    }
-
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
+        return address;
+    }// <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /** 
      * Handles the HTTP <code>GET</code> method.
      * @param request servlet request
