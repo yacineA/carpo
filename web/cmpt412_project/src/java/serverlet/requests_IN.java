@@ -48,6 +48,8 @@ public class requests_IN extends HttpServlet {
         boolean isLogged = false;
         String start_address="";
         String end_address="";
+        start_address=convert(slat,slog);
+        end_address = convert(elat, elog);
          
         try {
             Events events = new Events();
