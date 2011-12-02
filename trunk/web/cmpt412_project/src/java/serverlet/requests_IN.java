@@ -6,15 +6,24 @@ package serverlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.Statement;
+import java.net.URL;
+import java.net.HttpURLConnection;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import superclass.Events;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.input.SAXBuilder;
+import org.xml.sax.InputSource;
 
 /**
  *
@@ -37,6 +46,44 @@ public class requests_IN extends HttpServlet {
         String elog = request.getParameter("end_log");
         PrintWriter out = response.getWriter();
         boolean isLogged = false;
+        String address="";
+        
+
+        URL url = null;
+
+        HttpURLConnection httpurlconnection = null;
+
+        try {
+            url = new URL("http://maps.google.com/maps/api/geocode/xml?latlng="+slat+","+slog+"&sensor=true");
+            
+            httpurlconnection = (HttpURLConnection) url.openConnection();
+            httpurlconnection.setDoOutput(true);
+            httpurlconnection.setRequestMethod("GET");
+            
+            BufferedReader in = null;
+            StringBuffer sb = new StringBuffer();
+            in = new BufferedReader(new InputStreamReader(httpurlconnection.getInputStream()));
+            String inputLine;
+            while((inputLine = in.readLine())!=null){
+                sb.append(inputLine);
+            }
+            
+            StringReader read = new StringReader(sb.toString());
+            InputSource source = new InputSource(read);
+            SAXBuilder sax = new SAXBuilder();
+            
+            Document doc = sax.build(source);
+            Element root = doc.getRootElement();
+            address = root.getChild("result").getChildText("formatted_address");
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }finally{
+            if(httpurlconnection != null){
+                httpurlconnection.disconnect();
+            }
+        }
+        
         try {
             Events events = new Events();
             isLogged = events.verify_token(id, token);
@@ -49,8 +96,8 @@ public class requests_IN extends HttpServlet {
                     Connection con = DriverManager.getConnection("jdbc:mysql://70.64.6.83:3306/test", "root", "test");
                     Statement stmt = con.createStatement();
                     
-                    stmt.executeUpdate("INSERT INTO test.offer ( id, start_time, start_lat, start_log, status, creator, end_lat, end_log)VALUES "
-                                + "('"+id+"', '"+stime+"','"+slat+"','"+slog+"','"+status+"', '"+creator+"', '"+elat+"', '"+elog+"')"); 
+                    stmt.executeUpdate("INSERT INTO test.offer ( id, start_time, start_lat, start_log, status, creator, end_lat, end_log, address)VALUES "
+                                + "('"+id+"', '"+stime+"','"+slat+"','"+slog+"','"+status+"', '"+creator+"', '"+elat+"', '"+elog+"', '" + address + "')");
                     out.println("<Message>");
                     out.println("true");
                     out.println("</Message");
