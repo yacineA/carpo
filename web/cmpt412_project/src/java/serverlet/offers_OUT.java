@@ -62,6 +62,7 @@ public class offers_OUT extends HttpServlet {
                         String e_elat = rs.getString("end_lat");
                         String e_elog = rs.getString("end_log");
                         
+                        
                         out.println("<Offer>");          
                         out.println("<Type>Offer</Type>");
                         out.println("<ID>"+u_id+"</ID>");
