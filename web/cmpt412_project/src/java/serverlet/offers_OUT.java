@@ -50,7 +50,7 @@ public class offers_OUT extends HttpServlet {
                     Connection con=DriverManager.getConnection("jdbc:mysql://70.64.6.83:3306/test","root","test");
                     Statement stmt = con.createStatement();
                     //ResultSet rs = stmt.executeQuery("select * from offer LIMIT "+count);
-                    ResultSet rs = stmt.executeQuery("select * from offer where start_time < "+start_time+" LIMIT "+count);
+                    ResultSet rs = stmt.executeQuery("select * from offer where start_time < '"+start_time+"'"+" LIMIT "+count);
                     while(rs.next()){
                         int u_id = rs.getInt("id");
                         String e_creator = rs.getString("creator");
