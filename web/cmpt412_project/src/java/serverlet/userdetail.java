@@ -121,7 +121,7 @@ public class userdetail extends HttpServlet {
                 out.print("<PsgRating>" + tmpStr + "</PsgRating>");
                 out.print("</User>");
             }else{
-                throw new Exception("You are not allowed to view the information for this user");
+                throw new Exception("You are not allowed to view the information for this user.");
             }
         } catch (Exception e) {
             out.print("<Error>" + e.toString() + "</Error>");
