@@ -27,6 +27,7 @@ public class offers_OUT extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
         String id = request.getParameter("id");
         String token = request.getParameter("token");
+        String start_time = request.getParameter("startdatetime");
         String count="10";
         if(request.getParameter("count")!=null)
             count=request.getParameter("count");
@@ -48,8 +49,8 @@ public class offers_OUT extends HttpServlet {
                     Class.forName("com.mysql.jdbc.Driver");
                     Connection con=DriverManager.getConnection("jdbc:mysql://70.64.6.83:3306/test","root","test");
                     Statement stmt = con.createStatement();
-                    ResultSet rs = stmt.executeQuery("select * from offer LIMIT "+count);
-                   
+                    //ResultSet rs = stmt.executeQuery("select * from offer LIMIT "+count);
+                    ResultSet rs = stmt.executeQuery("select * from offer where start_time < "+start_time+" LIMIT "+count);
                     while(rs.next()){
                         int u_id = rs.getInt("id");
                         String e_creator = rs.getString("creator");
