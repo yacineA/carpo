@@ -27,12 +27,16 @@ public class offers_OUT extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
         String id = request.getParameter("id");
         String token = request.getParameter("token");
+        String count="10";
+        if(request.getParameter("count")!=null)
+            count=request.getParameter("count");
+        
         boolean isLogged = false;
         PrintWriter out = response.getWriter();
         try {
             Events e = new Events();
             isLogged = e.verify_token(id, token);
-            out.print(isLogged);
+           // out.print(isLogged);
              
         } catch(Exception e){
         }finally {
@@ -44,7 +48,7 @@ public class offers_OUT extends HttpServlet {
                     Class.forName("com.mysql.jdbc.Driver");
                     Connection con=DriverManager.getConnection("jdbc:mysql://70.64.6.83:3306/test","root","test");
                     Statement stmt = con.createStatement();
-                    ResultSet rs = stmt.executeQuery("select * from offer");
+                    ResultSet rs = stmt.executeQuery("select * from offer LIMIT "+count);
                    
                     while(rs.next()){
                         int u_id = rs.getInt("id");
@@ -59,7 +63,7 @@ public class offers_OUT extends HttpServlet {
                         String e_elog = rs.getString("end_log");
                         
                         out.println("<Offer>");          
-                        out.println("<Type>Offer<Type>");
+                        out.println("<Type>Offer</Type>");
                         out.println("<ID>"+u_id+"</ID>");
                         out.println("<Creator>"+e_creator+"</Creator>");
                         out.println("<StartTime>"+e_stime+"</StartTime>");
@@ -67,7 +71,7 @@ public class offers_OUT extends HttpServlet {
                         out.println("<StartLongitude>"+e_slon+"</StartLongitude>");
                         out.println("<Status>"+u_status+"</Status>");
                         out.println("<Capacity>"+u_capcity+"</Capacity>");
-                        out.println("<Shared>"+u_share+"Shared");
+                        out.println("<Shared>"+u_share+"</Shared>");
                         out.println("<EndLatitude>"+e_elat+"</EndLatitude>");
                         out.println("<EndLongitude>"+e_elog+"</EndLongitude>");
                         out.println("</Offer>");
