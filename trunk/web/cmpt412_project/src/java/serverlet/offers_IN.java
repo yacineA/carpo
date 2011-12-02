@@ -38,7 +38,6 @@ public class offers_IN extends HttpServlet {
         PrintWriter out = response.getWriter();
         String id = request.getParameter("id");
         String token = request.getParameter("token");
-        String creator = request.getParameter("creator");
         String stime = request.getParameter("start_time");
         String slat = request.getParameter("start_lat");
         String slog = request.getParameter("start_log");
@@ -100,8 +99,8 @@ public class offers_IN extends HttpServlet {
                     Connection con = DriverManager.getConnection("jdbc:mysql://70.64.6.83:3306/test", "root", "test");
                     Statement stmt = con.createStatement();
 
-                    stmt.executeUpdate("INSERT INTO test.offer ( id, creator, start_time, start_lat, start_log, status, capacity, if_share, end_lat, end_log, address)VALUES "
-                            + "('" + id + "', '" + creator + "', '" + stime + "','" + slat + "','" + slog + "','" + status + "','" + capacity + "', '" + share + "', '" + elat + "', '" + elog + "', '" + address + "')");
+                    stmt.executeUpdate("INSERT INTO test.offer ( creator, start_time, start_lat, start_log, status, capacity, if_share, end_lat, end_log, address)VALUES "
+                            + "('" + id + "', '" + stime + "','" + slat + "','" + slog + "','" + status + "','" + capacity + "', '" + share + "', '" + elat + "', '" + elog + "', '" + address + "')");
                     out.println("<Message>");
                     out.println("true");
                     out.println("</Message");
