@@ -109,7 +109,7 @@ public class requests_OUT extends HttpServlet
                         out.println("<EndLatitude>" + e_elat + "</EndLatitude>");
                         out.println("<EndLongitude>" + e_elog + "</EndLongitude>");
                         out.println("<StartAddress>" + s_address + "</StartAddress>");
-                        out.println("<EndAddress>" + e_address + "/EndAddress");
+                        out.println("<EndAddress>" + e_address + "</EndAddress>");
                         out.println("</Request>");
 
                     }
