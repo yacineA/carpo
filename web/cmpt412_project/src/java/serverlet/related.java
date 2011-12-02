@@ -26,8 +26,8 @@ import org.json.JSONObject;
  *
  * @author Executor
  */
-@WebServlet(name = "userdetail", urlPatterns = {"/userdetail"})
-public class userdetail extends HttpServlet {
+@WebServlet(name = "related", urlPatterns = {"/related"})
+public class related extends HttpServlet {
 
     /** 
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
@@ -42,12 +42,13 @@ public class userdetail extends HttpServlet {
         PrintWriter out = response.getWriter();
         out.print("<Result>");
         try {
-            if (request.getParameter("id") == null || request.getParameter("token") == null || request.getParameter("requestId") == null) {
+            if (request.getParameter("id") == null || request.getParameter("token") == null || request.getParameter("eventId") == null||request.getParameter("userId") == null) {
                 throw new Exception("Missing parameters!");
             }
             String id = request.getParameter("id");
             String token = request.getParameter("token");
-            String requestId = request.getParameter("requestId");
+            String eventId = request.getParameter("eventId");
+            String requestId = request.getParameter("userId");
             String userInfoStr = "";
             try {
                 URL url = new URL("https://graph.facebook.com/" + id + "?fields=username,updated_time&access_token=" + token);
@@ -75,60 +76,22 @@ public class userdetail extends HttpServlet {
             Class.forName("com.mysql.jdbc.Driver");
             Connection con = DriverManager.getConnection("jdbc:mysql://70.64.6.83:3306/test", "root", "test");
             Statement stmt = con.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT * from user_info where id=" + id);
-            if (!rs.first()) {
+            ResultSet rs = stmt.executeQuery("SELECT * from user_info where id="+id);
+            if(!rs.next())
                 throw new Exception("User not registered.");
+            rs=stmt.executeQuery("SELECT * from offer where id="+eventId);
+            if(!rs.next()){
+                stmt.executeQuery("SELECT * from request where id=")
+                throw new Exception("Offer with id "+eventId+" not found.");
             }
-            rs = stmt.executeQuery("SELECT * from test.user_info where id=" + requestId);
-            if (!rs.first()) {
-                throw new Exception("User with id " + requestId + " not found.");
-            }
-            rs = stmt.executeQuery("SELECT * from offer where creator=" + requestId);
-            if (!rs.first()) {
-                throw new Exception("The requested user does not have any offer records.");
-            }
-            int offerId[] = null;
-            int i = 0;
-            do {
-                offerId[i] = rs.getInt("id");
-                i++;
-            } while (rs.next());
-            rs = stmt.executeQuery("SELECT * from joined_passenger where user_id=" + id + " AND status=0");
-            boolean permitted = false;
-            while (rs.next()) {
-                for (int j = 0; j < i + 1; j++) {
-                    if (rs.getInt("offer_id") == offerId[j]) {
-                        permitted = true;
-                        break;
-                    }
-                }
-            }
-            if (permitted) {
-                out.print("<User>");
-                String tmpStr = rs.getString("id");
-                out.print("<ID>" + tmpStr + "</ID>");
-                tmpStr = rs.getString("name");
-                out.print("<Name>" + tmpStr + "</Name>");
-                tmpStr = rs.getString("email");
-                out.print("<Email>" + tmpStr + "</Email>");
-                tmpStr = rs.getString("status");
-                out.print("<Status>" + tmpStr + "</Status>");
-                tmpStr = rs.getString("type_code");
-                out.print("<TypeCode>" + tmpStr + "</TypeCode>");
-                tmpStr = rs.getString("driver_rating");
-                out.print("<DriverRating>" + tmpStr + "</DriverRating>");
-                tmpStr = rs.getString("PsgRating");
-                out.print("<PsgRating>" + tmpStr + "</PsgRating>");
-                out.print("</User>");
-            }else{
-                throw new Exception("You are not allowed to view the information for this user");
-            }
+            stmt.executeUpdate("INSERT INTO test.joined_passenger (offer_id, user_id, status) VALUES ("+offerId+", "+id+", 1)");
+            out.print("<Message>true</Message>");
         } catch (Exception e) {
             out.print("<Error>" + e.toString() + "</Error>");
         } finally {
             out.print("</Result>");
             out.close();
-        }
+        }   
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

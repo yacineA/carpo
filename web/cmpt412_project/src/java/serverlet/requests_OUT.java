@@ -33,6 +33,9 @@ public class requests_OUT extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
         String id = request.getParameter("id");
         String token = request.getParameter("token");
+        String count="10";
+        if(request.getParameter("count")!=null)
+            count=request.getParameter("count");
         boolean isLogged = false;
         PrintWriter out = response.getWriter();
         try {
@@ -47,7 +50,7 @@ public class requests_OUT extends HttpServlet {
                     Class.forName("com.mysql.jdbc.Driver");
                     Connection con=DriverManager.getConnection("jdbc:mysql://70.64.6.83:3306/test","root","test");
                     Statement stmt = con.createStatement();
-                    ResultSet rs = stmt.executeQuery("select * from request");
+                    ResultSet rs = stmt.executeQuery("select * from request LIMIT "+count);
                    
                     while(rs.next()){
                         int u_id = rs.getInt("id");                       
